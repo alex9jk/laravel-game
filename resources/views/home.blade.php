@@ -14,7 +14,19 @@
                         </div>
                     @endif
 
-                    You are logged in!
+                    You are logged in! Welcome, {{$user->name}}
+                    <div>
+                    @foreach ($messages as $message)
+                        <div> {{ $message->messageText }}</div>
+                    @endforeach
+                    </div>
+                    <div>
+                        <form method="POST">
+                            <input type="text" name="message" />
+                            <input type="hidden" name="_token" value="{{ csrf_token() }}" />
+                            <input type="submit" name="submit"/>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
