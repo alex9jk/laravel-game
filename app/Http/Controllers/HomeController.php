@@ -36,6 +36,7 @@ class HomeController extends Controller
             'message' => 'required',
         ]);
         $user = Auth::user();
+        
         $message = new Message();
         
         $message->user_id = $user->id;

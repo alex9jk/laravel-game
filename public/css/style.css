@@ -1,0 +1,16 @@
+.chatSend{
+    padding:.5em;
+    
+  }
+  .header{
+    padding: .5em;
+  }
+  .box {
+    background-color: #DBD1D1;
+    border-style: solid;
+    border-color: black;
+    width: 75%;
+  }
+  .message {
+    padding:.5em
+  }
