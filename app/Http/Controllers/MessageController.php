@@ -17,6 +17,18 @@ class MessageController extends Controller
         //
     }
 
+    public function checkMessages(Request $request){
+        // $this->validate( $request,[
+        //     'id' => 'required',
+        // ]);
+
+        $messageCheck = Message::latest()->take(50)->get();
+
+        return response()->json([
+            'success'  => true,
+            'data' => $messageCheck
+        ]);
+    }
     /**
      * Show the form for creating a new resource.
      *

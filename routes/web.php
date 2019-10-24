@@ -17,5 +17,23 @@ Route::get('/', function () {
 
 Auth::routes();
 
+Route::group(['middleware' => 'auth'], function () { 
+    Route::get('/playgame', [
+        'uses'=>'GameController@index',
+        'as' => 'game.playgame'
+    ]);
+    
+    Route::post('/checkStatus', [
+        'uses'=>'GameController@checkStatus',
+        
+    ]);
+
+    Route::post('/home', [
+        'uses'=>'MessageController@checkMessages',
+        
+    ]);
+    Route::post('/getLobbyChat', 'HomeController@getLobbyMessages');
+    Route::post('/sendChatData', 'HomeController@chat');
+});
 Route::get('/home', 'HomeController@index')->name('home');
-Route::post('/home', 'HomeController@chat');
+

@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Game;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Auth;
 
 class GameController extends Controller
 {
@@ -14,7 +16,26 @@ class GameController extends Controller
      */
     public function index()
     {
-        //
+        $user = Auth::user();
+        $game = new Game();
+        $game->player1ID = $user->id;
+        $game->gameState = 'waiting';
+        $game->save();
+        return view('game.playgame',['user'=>$user,'game'=>$game]);
+
+    }
+    public function checkStatus(Request $request){
+
+        $this->validate( $request,[
+            'id' => 'required',
+        ]);
+
+        $game = Game::where("id",$request['id'])->first();
+
+        return response()->json([
+            'success'  => true,
+            'data' => $game
+        ]);
     }
 
     /**

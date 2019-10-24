@@ -4,13 +4,17 @@
   }
   .header{
     padding: .5em;
+    text-align: center;
   }
   .box {
     background-color: #DBD1D1;
     border-style: solid;
     border-color: black;
     width: 75%;
+    height: 500px;
+    overflow: scroll;
   }
   .message {
-    padding:.5em
+    padding:.5em;
+    
   }
