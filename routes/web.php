@@ -32,8 +32,20 @@ Route::group(['middleware' => 'auth'], function () {
         'uses'=>'MessageController@checkMessages',
         
     ]);
+    Route::post('/lobbyUsers', [
+        'uses'=>'HomeController@getLobbyUsers',
+        
+    ]);
     Route::post('/getLobbyChat', 'HomeController@getLobbyMessages');
     Route::post('/sendChatData', 'HomeController@chat');
+    Route::post('/checkChallengeAccepted', 'HomeController@getChallengeAccepted');
+    Route::post('/challengeUser', 'HomeController@challengeUser');
+    Route::post('/getChallenges', 'HomeController@getChallenges');
+
+    Route::post('/getGameChat', 'GameController@getLobbyMessages');
+    Route::post('/sendGameData', 'GameController@chat');
+
+    
 });
 Route::get('/home', 'HomeController@index')->name('home');
 

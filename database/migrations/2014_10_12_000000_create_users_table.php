@@ -21,7 +21,8 @@ class CreateUsersTable extends Migration
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();
-            $table->boolean('inGame')->default(false);
+            $table->string('playerStatus')->default('waiting');
+            
         });
     }
 

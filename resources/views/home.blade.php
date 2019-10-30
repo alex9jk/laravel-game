@@ -5,8 +5,8 @@
     <div class="row justify-content-center">
         <div class="col-md-8">
                 <h2 class="header">Welcome <strong>{{$user->name}} </strong>to Connect 4 Lobby</h2>
-                <a class="btn btn-primary" href={{route('game.playgame')}}>Play game</a>
-                <div class="box">
+                <a class="btn btn-primary" id = "btn"href={{route('game.playgame')}}>Play game</a>
+                <div class="box" id="box">
                     @if (session('status'))
                         <div class="alert alert-success" role="alert">
                             {{ session('status') }}
@@ -20,10 +20,11 @@
                                 <input type="hidden" name="_token" value="{{ csrf_token() }}" />
                                 <input type="submit" name="chat" value="send"class="submit"/>
                             </form>
-                        </div>  
+                        </div>
+                <div id="waiting-users"></div>  
             </div>
         </div>
 </div>
 
-
+<script src="{{ asset('js/lobby.js') }}" defer></script>
 @endsection

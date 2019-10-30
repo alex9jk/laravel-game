@@ -11,10 +11,13 @@
     border-style: solid;
     border-color: black;
     width: 75%;
-    height: 500px;
+    height: 350px;
     overflow: scroll;
   }
   .message {
     padding:.5em;
     
+  }
+  #btn {
+    margin-bottom: .5em;
   }
