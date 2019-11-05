@@ -8,6 +8,7 @@ use App\User;
 use App\Message;
 use App\Game;
 
+
 class HomeController extends Controller
 {
     /**
@@ -27,11 +28,14 @@ class HomeController extends Controller
      */
     public function index()
     {
+        
         $user = Auth::user();
+        //\DB::table('games')->where('gameState', '=', 'challenge')->where('player1ID','=',$user->id)->orWhere('player2ID','=',$user->id)->delete();
         $user->playerStatus = "waiting";
         $user->save();
         $messages = Message::whereNull('game_id')->get();
-        return view('home',['user'=>$user,'messages'=>$messages]);
+        $games = \DB::table('games')->where('player1ID','=',$user->id)->orWhere('player2ID','=',$user->id)->get();
+        return view('home',['user'=>$user,'messages'=>$messages,'games' =>$games]);
     }
     public function chat(Request $request){
 
@@ -67,20 +71,39 @@ class HomeController extends Controller
 
         $user = Auth::user();  
         $waitingUsers = User::where('id',"!=",$user->id)->where("playerStatus","=","waiting")->get();
-        return response()->json([
-            'success'  => true,
-            'data' => $waitingUsers
+
+        if($waitingUsers == null || $waitingUsers->count() != 1){
+            return response()->json([
+                'success'  => false
+                ]);
+        }
+       return response()->json([
+        'success'  => true,
+        'data' => $waitingUsers
+    
         ]);
 
     }
 
     public function getChallengeAccepted(Request $request){
 
-
+        // $this->validate( $request,[
+        //     'gameid' => 'required',
+        // ]);
+         $user = Auth::user();  
+        $game= Game::where("player1ID","=",$user->id)->where("gameState","=","playing")->get();
+        if($game == null || $game->count() != 1){
+            return response()->json([
+                'success'  => false,
+                'data' => $user
+                ]);
+        }
        return response()->json([
-        'success'  => true
-
-    ]);
+        'success'  => true,
+        'data' => $game
+    
+        ]);
+    
  }
 
  public function challengeUser(Request $request){
@@ -99,6 +122,32 @@ class HomeController extends Controller
     'data' => $game
 
     ]);
+}
+
+public function joinGame(Request $request){
+    $this->validate( $request,[
+        'gameid' => 'required',
+    ]);
+    $user = Auth::user();  
+    $game= Game::where("id","=",$request->gameid)->where("gameState","=","challenge")->first();
+   
+    if($game == null || $game->count() != 1){
+        return response()->json([
+            'success'  => false
+            ]);
+    }
+    $game->gameState = "playing";
+    $game->save();
+   return response()->json([
+    'success'  => true,
+    'data' => $game
+
+    ]);
+
+
+
+
+
 }
 
 public function getChallenges(Request $request){

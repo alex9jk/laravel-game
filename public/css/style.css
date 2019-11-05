@@ -2,6 +2,18 @@
     padding:.5em;
     
   }
+  #form-div {
+    display: block;
+  }
+#flex {
+  display: flex;
+}
+.outer{
+  flex-grow: .75;
+}
+.form-control {
+  width:75%;
+}
   .header{
     padding: .5em;
     text-align: center;
@@ -10,7 +22,7 @@
     background-color: #DBD1D1;
     border-style: solid;
     border-color: black;
-    width: 75%;
+    width: 95%;
     height: 350px;
     overflow: scroll;
   }
@@ -20,4 +32,12 @@
   }
   #btn {
     margin-bottom: .5em;
+  }
+  .availableUsers {
+    cursor: pointer;
+    padding: .5em;
+  }
+  .availableUsers:hover {
+    background-color: dodgerblue;
+    
   }

@@ -41,6 +41,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('/checkChallengeAccepted', 'HomeController@getChallengeAccepted');
     Route::post('/challengeUser', 'HomeController@challengeUser');
     Route::post('/getChallenges', 'HomeController@getChallenges');
+    Route::post('/joinGame', 'HomeController@joinGame');
 
     Route::post('/getGameChat', 'GameController@getLobbyMessages');
     Route::post('/sendGameData', 'GameController@chat');

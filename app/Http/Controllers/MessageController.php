@@ -21,7 +21,7 @@ class MessageController extends Controller
         // $this->validate( $request,[
         //     'id' => 'required',
         // ]);
-
+        
         $messageCheck = Message::latest()->take(50)->get();
 
         return response()->json([
