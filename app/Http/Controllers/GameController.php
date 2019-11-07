@@ -12,19 +12,19 @@ use Auth;
 class GameController extends Controller
 {
     /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
+     * 
+     * returns game view with board set up
+     * @return game view
      */
     public function index()
     {
-        $user = Auth::user();
-        $game = new Game();
-        $game->player1ID = $user->id;
-        $game->gameState = 'waiting';
-        $game->save();
-        return view('game.playgame',['user'=>$user,'game'=>$game]);
-
+        // $user = Auth::user();
+        // $game = new Game();
+        // $game->player1ID = $user->id;
+        // $game->gameState = 'waiting';
+        // $game->save();
+        // return view('game.playgame',['user'=>$user,'game'=>$game]);
+        return view('game.playgame');
     }
     public function checkStatus(Request $request){
 
@@ -40,6 +40,12 @@ class GameController extends Controller
         ]);
     }
 
+            /**
+     * 
+     *Posts message to game chat from form
+     *@param request object
+     * @return if messaged gets saved to database returns success
+     */
     public function chat(Request $request){
 
         $this->validate( $request,[
@@ -58,6 +64,13 @@ class GameController extends Controller
             'success'  => true
         ]);
     }
+
+            /**
+     * 
+     *Gets messages from database for the game chat --gets all messages with current gameid
+     * @param request object
+     * @return json messages object
+     */
     public function getLobbyMessages(Request $request){
         $this->validate( $request,[
             'gameid' => 'required'

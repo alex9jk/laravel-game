@@ -20,7 +20,7 @@
                             <form method="POST" class="chatSend">
                                 <input type="text" name="message" class="form-control" min="50" id="messageInput"/>
                                 <input type="hidden" name="_token" value="{{ csrf_token() }}" />
-                                <input type="submit" name="chat" value="send"class="submit"/>
+                                <input type="submit" name="chat" value="send"class="submit btn btn-primary"/>
                             </form>
                         </div>
                 </div>

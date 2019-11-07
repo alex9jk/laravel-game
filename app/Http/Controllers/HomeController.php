@@ -22,9 +22,9 @@ class HomeController extends Controller
     }
 
     /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
+     * 
+     *Sets up player in lobby and populates initial chat window
+     * @return view for home page along with user info, chat messages and game stats
      */
     public function index()
     {
@@ -37,6 +37,13 @@ class HomeController extends Controller
         $games = \DB::table('games')->where('player1ID','=',$user->id)->orWhere('player2ID','=',$user->id)->get();
         return view('home',['user'=>$user,'messages'=>$messages,'games' =>$games]);
     }
+
+        /**
+     * 
+     *Posts message to lobby chat from form
+     *@param request object
+     * @return if messaged gets saved to database returns success
+     */
     public function chat(Request $request){
 
         $this->validate( $request,[
@@ -53,6 +60,12 @@ class HomeController extends Controller
             'success'  => true
         ]);
     }
+        /**
+     * 
+     *Gets messages from database for the lobby chat --gets all messages that don't have a gameid associated with it
+     * @param request object
+     * @return json messages object
+     */
     public function getLobbyMessages(Request $request){
 
         $user = Auth::user();  
@@ -66,7 +79,11 @@ class HomeController extends Controller
         ]);
 
     }
-
+    /**
+     * gets all users in lobby who aren't playing a game or havn't been challenged
+     *@param request object
+     * @return array of users
+     */
     public function getLobbyUsers(Request $request){
 
         $user = Auth::user();  
@@ -84,7 +101,12 @@ class HomeController extends Controller
         ]);
 
     }
-
+    /**
+     * 
+     *determines wheather challenge has been accepted by other user
+     *@param request object
+     * @return all associated game info
+     */
     public function getChallengeAccepted(Request $request){
 
         // $this->validate( $request,[
@@ -105,6 +127,11 @@ class HomeController extends Controller
         ]);
     
  }
+     /**
+     * creates a new game and sets the challenger and person being challenged
+     *@param request object
+     * @return game data
+     */
 
  public function challengeUser(Request $request){
 
@@ -112,6 +139,7 @@ class HomeController extends Controller
         'challenge' => 'required',
     ]);
     $user = Auth::user();  
+    \DB::table('games')->where('gameState', '=', 'challenge')->orWhere('player1ID','=',$user->id)->delete();
     $game = new Game();
     $game->player1ID = $user->id;
     $game->player2ID = (int) $request->challenge;
@@ -123,7 +151,11 @@ class HomeController extends Controller
 
     ]);
 }
-
+    /**
+     * if you've been challenged this is where you accept challenge and start a new game
+     *@param request object
+     * @return game data
+     */
 public function joinGame(Request $request){
     $this->validate( $request,[
         'gameid' => 'required',
@@ -144,25 +176,30 @@ public function joinGame(Request $request){
 
     ]);
 
-
-
-
-
 }
+
+    /**
+     * user is waiting for response from other user if they want to join game
+     *@param request object
+     * @return game data
+     */
 
 public function getChallenges(Request $request){
 
     $user = Auth::user();  
-    $game= Game::where("player2ID","=",$user->id)->where("gameState","=","challenge")->first();
+    $games= Game::where("player2ID","=",$user->id)->where("gameState","=","challenge")->first();
+    $challenger = User::where('id','=',$games->player1ID)->first();
+    $games->challenger = $challenger->name;
+
    
-    if($game == null || $game->count() != 1){
+    if($games == null || $games->count() != 1){
         return response()->json([
             'success'  => false
             ]);
     }
    return response()->json([
     'success'  => true,
-    'data' => $game
+    'data' => $games
 
     ]);
 }

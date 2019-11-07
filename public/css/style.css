@@ -41,3 +41,9 @@
     background-color: dodgerblue;
     
   }
+  table {
+    margin-top: 8em;
+  }
+  .submit {
+    margin-top: .25em;
+  }
