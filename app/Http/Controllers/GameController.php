@@ -16,15 +16,20 @@ class GameController extends Controller
      * returns game view with board set up
      * @return game view
      */
-    public function index()
+    public function index($id)
     {
-        // $user = Auth::user();
-        // $game = new Game();
-        // $game->player1ID = $user->id;
-        // $game->gameState = 'waiting';
-        // $game->save();
-        // return view('game.playgame',['user'=>$user,'game'=>$game]);
-        return view('game.playgame');
+        $user = Auth::user();
+        $game = Game::where('gameState', '=', 'playing')->where('player1ID','=',$user->id)->orWhere('player2ID','=',$user->id)->first();
+        //set up array of arrays for board 
+        //array with 6 arrays in it with 7 0s
+        //set values in array to 0
+        //JSON.stringify()
+        if($game == null || $game->count() != 1){
+            return redirect('/home');
+        }
+        
+        return view('game.playgame',['user'=>$user,'game'=>$game]);
+      //  return view('game.playgame');
     }
     public function checkStatus(Request $request){
 
@@ -80,7 +85,7 @@ class GameController extends Controller
         
      if(sizeof($messages) > 0){
         foreach($messages as $message){  
-           $message->name = User::where("id","=",$user->id)->get();
+           $message->name = User::where("id","=",$message->user_id)->first()->name;
         }
         return response()->json([
             'success'  => true,
@@ -92,8 +97,55 @@ class GameController extends Controller
             'success'  => false
         ]);
      }   
+    }
 
+    public function quitGame(Request $request){
+        $this->validate( $request,[
+            'id' => 'required'
+        ]);
+        
+        $game = Game::where('id',"=",$request->id)->first();
+        $game->gameState = "forfeit";
 
+        if($game->player1ID == Auth::id()){
+            $game->winner = $game->player2ID;
+        }
+        else if($game->player2ID == Auth::id()){
+            $game->winner = $game->player1ID;
+
+        }
+        $game->save();
+        if($game == null || $game->count() != 1 || $game->winner == null){
+            return response()->json([
+                'success'  => false
+                
+                ]);
+        }
+       return response()->json([
+        'success'  => true,
+        'data' => $game
+    
+        ]);
+    }
+
+    public function gameState(Request $request){
+        $this->validate( $request,[
+            'id' => 'required'
+        ]);
+        
+        $game = Game::where('id',"=",$request->id)->get();
+
+        if($game == null || $game->count() != 1){
+            return response()->json([
+                'success'  => false
+                
+                ]);
+        }
+       return response()->json([
+        'success'  => true,
+        'data' => $game
+    
+        ]);
     }
 
     /**

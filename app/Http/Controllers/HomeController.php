@@ -89,7 +89,7 @@ class HomeController extends Controller
         $user = Auth::user();  
         $waitingUsers = User::where('id',"!=",$user->id)->where("playerStatus","=","waiting")->get();
 
-        if($waitingUsers == null || $waitingUsers->count() != 1){
+        if($waitingUsers == null || $waitingUsers->count() < 1){
             return response()->json([
                 'success'  => false
                 ]);
@@ -116,8 +116,8 @@ class HomeController extends Controller
         $game= Game::where("player1ID","=",$user->id)->where("gameState","=","playing")->get();
         if($game == null || $game->count() != 1){
             return response()->json([
-                'success'  => false,
-                'data' => $user
+                'success'  => false
+                
                 ]);
         }
        return response()->json([
@@ -187,19 +187,22 @@ public function joinGame(Request $request){
 public function getChallenges(Request $request){
 
     $user = Auth::user();  
-    $games= Game::where("player2ID","=",$user->id)->where("gameState","=","challenge")->first();
-    $challenger = User::where('id','=',$games->player1ID)->first();
-    $games->challenger = $challenger->name;
+    $game= Game::where("player2ID","=",$user->id)->where("gameState","=","challenge")->first();
+    if($game != null){
+        $challenger = User::where('id','=',$game->player1ID)->first();
+        $game->challenger = $challenger->name;
+    }
+
 
    
-    if($games == null || $games->count() != 1){
+    if($game == null || $game->count() != 1){
         return response()->json([
             'success'  => false
             ]);
     }
    return response()->json([
     'success'  => true,
-    'data' => $games
+    'data' => $game
 
     ]);
 }

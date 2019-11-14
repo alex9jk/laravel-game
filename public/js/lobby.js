@@ -11,7 +11,7 @@ checkLobbyUsers();
 chatPoller = setInterval(checkChat, 1000);
 userPoller = setInterval(checkLobbyUsers, 500);
 challengeAcceptedPoller = setInterval(checkChallengeAccept, 5000);
-challengePoller = setInterval(checkChallenge, 5000);
+var challengePoller = setInterval(checkChallenge, 5000);
 
 $(document).ready(function () {
     //ajax call on form to prevent it from submitting and sending chat messages to database
@@ -105,7 +105,7 @@ function checkLobbyUsers() {
         dataType: "json",
         data: csrf,
         success: function (data) {
-            //console.log(data);
+            console.log(data);
             if (data.success) {
                 var userName = "";
                 if (data.data.length > 0) {
@@ -134,9 +134,10 @@ function checkChallengeAccept() {
         dataType: "json",
         data: csrf,
         success: function (data) {
+            console.log("checkChallengeAccepted");
             console.log(data);
             if (data.success) {
-                window.location.href = "playgame";
+               window.location.href = "playgame/"+data.data[0].id;
             }
 
         },
@@ -161,10 +162,12 @@ function checkChallenge() {
         success: function (data) {
 
             if (data.success) {
+                  clearInterval(challengePoller);
                 var r = confirm("Do you want to play " + data.data.challenger + "?");
                 if (r == true) {
                     joinGame(data.data.id);
                 } else {
+                    challengePoller = setInterval(checkChallenge, 5000);
 
                 }
             }
@@ -194,7 +197,7 @@ function joinGame(id) {
         success: function (data) {
             console.log(data);
             if (data.success) {
-                window.location.href = "playgame";
+                window.location.href = "playgame/"+id;
             }
         },
         failure: function (err) {

@@ -5,7 +5,6 @@
     <div class="row justify-content-center">
         <div class="col-md-8">
                 <h2 class="header">Welcome <strong>{{$user->name}} </strong>to Connect 4 Lobby</h2>
-                <a class="btn btn-primary" id = "btn"href={{route('game.playgame')}}>Play game</a>
         <div id="flex">
             <div class="outer">
                 <div class="box" id="box">

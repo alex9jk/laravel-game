@@ -18,7 +18,7 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::group(['middleware' => 'auth'], function () { 
-    Route::get('/playgame', [
+    Route::get('/playgame/{id}', [
         'uses'=>'GameController@index',
         'as' => 'game.playgame'
     ]);
@@ -45,6 +45,8 @@ Route::group(['middleware' => 'auth'], function () {
 
     Route::post('/getGameChat', 'GameController@getLobbyMessages');
     Route::post('/sendGameData', 'GameController@chat');
+    Route::post('/quitGame', 'GameController@quitGame');
+    Route::post('/gameState', 'GameController@gameState');
 
     
 });
