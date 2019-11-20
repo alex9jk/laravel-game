@@ -6,6 +6,7 @@ use App\Game;
 use App\Message;
 use App\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Symfony\Component\HttpFoundation\Response;
 use Auth;
 
@@ -20,10 +21,24 @@ class GameController extends Controller
     {
         $user = Auth::user();
         $game = Game::where('gameState', '=', 'playing')->where('player1ID','=',$user->id)->orWhere('player2ID','=',$user->id)->first();
+        $userArray = array($game->player1ID,$game->player2ID);
+        $random = Arr::random($userArray);
+        $game->playerTurn = $random;
         //set up array of arrays for board 
         //array with 6 arrays in it with 7 0s
         //set values in array to 0
         //JSON.stringify()
+        $boardArray = array();
+        for($i=0;$i<7;$i++){
+            $subArray = array();
+            
+            for($j=0;$j<6;$j++){
+                $subArray[$j] = 0;
+            }
+            $boardArray[$i] = $subArray;
+        }
+        $game->boardArray = json_encode($boardArray);
+        $game->save();
         if($game == null || $game->count() != 1){
             return redirect('/home');
         }
@@ -148,6 +163,21 @@ class GameController extends Controller
         ]);
     }
 
+    public function isLegaLMove(Request $request){
+
+    }
+
+    public function updateBoard(Request $request){
+        $this->validate( $request,[
+            'board' => 'required',
+            'game_id' => 'required'
+        ]);
+        $game = Game::where('id',"=",$request->game_id)->first();
+    }
+
+    public function checkTurn(Request $request){
+
+    }
     /**
      * Show the form for creating a new resource.
      *

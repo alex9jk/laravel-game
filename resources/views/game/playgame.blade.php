@@ -6,7 +6,7 @@
         <div class="col-md-8">
                 <h2 class="header"><strong>Play Connect 4</strong></h2>
         <div id= "wrapper">    
-            <div>    
+            <div id="grow">    
                 <div class="box">
                     @if (session('status'))
                         <div class="alert alert-success" role="alert">

@@ -47,6 +47,10 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('/sendGameData', 'GameController@chat');
     Route::post('/quitGame', 'GameController@quitGame');
     Route::post('/gameState', 'GameController@gameState');
+    Route::post('/legalMove', 'GameController@isLegaLMove');
+    Route::post('/updateBoard', 'GameController@updateBoard');
+    Route::post('/checkTurn', 'GameController@checkTurn');
+    
 
     
 });

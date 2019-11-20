@@ -84,7 +84,7 @@ function checkChat() {
 
             var messageText = "";
             for (var i = 0; i < data.data.length; i++) {
-                messageText += "<div>" + data.data[i].name[0].name + ": " + data.data[i].messageText + "</div>";
+                messageText += "<div class='messages'><strong>" + data.data[i].name[0].name + ": </strong>" + data.data[i].messageText + "</div>";
             }
             $('.box').html(messageText);
             document.querySelector(".box").scrollTo(0, document.querySelector(".box").scrollHeight);

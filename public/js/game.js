@@ -16,9 +16,9 @@ var svgns = "http://www.w3.org/2000/svg";
 
 checkGameChat();
 chatGamePoller = setInterval(checkGameChat, 1000);
-gameStatePoller = setInterval(getGameState,5000);
+gameStatePoller = setInterval(getGameState, 5000);
 function createPiece() {
-    
+
     var piece = document.createElementNS(svgns, "circle");
     piece.setAttributeNS(null, "r", "25");
     piece.setAttributeNS(null, "cx", "40");
@@ -28,6 +28,72 @@ function createPiece() {
     piece.setAttributeNS(null, "id", "1");
     piece.setAttributeNS(null, "onmousedown", "setDrag(this.id)");
     document.getElementsByTagName('svg')[0].appendChild(piece);
+
+}
+
+function createOpponentPiece(cx, cy) {
+
+    var piece = document.createElementNS(svgns, "circle");
+    piece.setAttributeNS(null, "r", "25");
+    piece.setAttributeNS(null, "cx", "40");
+    piece.setAttributeNS(null, "cy", "40");
+    piece.setAttributeNS(null, "fill", "black");
+    piece.setAttributeNS(null, "r", "25");
+    piece.setAttributeNS(null, "id", "1");
+    piece.setAttributeNS(null, "cx", cx);
+    piece.setAttributeNS(null, "cy", cy);
+    piece.setAttributeNS(null,"class","playedPiece");
+    document.getElementsByTagName('svg')[0].appendChild(piece);
+
+}
+function createPlayedPiece(cx, cy) {
+
+    var piece = document.createElementNS(svgns, "circle");
+    piece.setAttributeNS(null, "r", "25");
+    piece.setAttributeNS(null, "cx", "40");
+    piece.setAttributeNS(null, "cy", "40");
+    piece.setAttributeNS(null, "fill", "red");
+    piece.setAttributeNS(null, "r", "25");
+    piece.setAttributeNS(null, "id", "1");
+    piece.setAttributeNS(null, "cx", cx);
+    piece.setAttributeNS(null, "cy", cy);
+    piece.setAttributeNS(null,"class","playedPiece");
+    document.getElementsByTagName('svg')[0].appendChild(piece);
+
+}
+function updateBoard(boardArr) {
+    [].forEach.call(document.querySelectorAll('.playedPiece'),function(e){
+        e.parentNode.removeChild(e);
+      });
+    boardArr = new Array();
+    for (var i = 0; i < 6; i++) {
+        subArray = new Array();
+        for (var j = 0; j < 7; j++) {
+            var random = Math.random();
+            if (random < .5) {
+                random = 1;
+            }
+            else {
+                random = 2;
+            }
+            subArray[j] = random;
+        }
+        boardArr[i] = subArray;
+    }
+    for (var i = 0; i < boardArr.length; i++) {
+        for (var j = 0; j < boardArr[i].length; j++) {
+            var cx = (j * 80) + 40;
+            var cy = (i * 80) + 120;
+            if(boardArr[i][j] == 1) {
+                createPlayedPiece(cx,cy);
+            }
+            else if(boardArr[i][j] == 2){
+                createOpponentPiece(cx,cy);
+            }
+
+        }
+    }
+
 
 }
 document.getElementsByTagName('svg')[0].addEventListener('mousemove', drag, false);
@@ -62,7 +128,7 @@ function drag(evt) {
     if (mover != '') {
         var me = document.getElementById(mover);
         var board = $('.boardContainer svg').position();
-
+        console.log(evt.clientX - board.left);
         me.setAttribute('cx', (evt.clientX - board.left));
         me.setAttribute('cy', (evt.clientY - board.top + $(window).scrollTop()));
     }
@@ -71,11 +137,16 @@ function drag(evt) {
     }
 }
 
-function releaseDrag() {
+function releaseDrag(evt) {
     if (mover != '') {
         //when i fire am i on a good space? (a cell)
+        console.log(evt);
         var curX = parseInt(document.getElementById(mover).getAttributeNS(null, 'cx'));
         var curY = parseInt(document.getElementById(mover).getAttributeNS(null, 'cy'));
+        document.getElementById(mover).setAttributeNS(null, 'cy', '40');
+        var currentX = (curX / 80) + 40
+        document.getElementById(mover).setAttributeNS(null, 'cx', currentX);
+
         mover = '';
         //check to see if this point is insde of a cell
         // var hit = checkHit(curX,curY);
@@ -104,11 +175,12 @@ function getGameState() {
         data: game,
         success: function (data) {
             console.log(data);
-            if(data.data[0].gameState == "forfeit"){
+            if (data.data[0].gameState == "forfeit") {
                 clearInterval(gameStatePoller);
                 var r = confirm("Opponent has forfeited");
                 window.location = "/laravelProject/public/home";
             }
+            updateBoard(data.data[0].boardArray);
         },
         failure: function (err) {
             console.log(err);
@@ -142,11 +214,11 @@ function forfeit() {
 
 }
 $(window).on('beforeunload', function (evt) {
-   
+
     // var r = confirm("Are you sure you want to quit?");
     // if (r == true) {
-        forfeit();
-   // }
+    forfeit();
+    // }
 
 });
 $(window).on('unload', function (evt) {
