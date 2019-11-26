@@ -50,6 +50,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('/legalMove', 'GameController@isLegaLMove');
     Route::post('/updateBoard', 'GameController@updateBoard');
     Route::post('/checkTurn', 'GameController@checkTurn');
+    Route::post('/playPiece', 'GameController@playPiece');
+    
     
 
     

@@ -13,86 +13,115 @@ var game = {
 var baseurl = "/laravelProject/public/";
 var svgns = "http://www.w3.org/2000/svg";
 //console.log(message);
-
+var pieceCounter = 0;
 checkGameChat();
 chatGamePoller = setInterval(checkGameChat, 1000);
-gameStatePoller = setInterval(getGameState, 5000);
-function createPiece() {
+gameStatePoller = setInterval(getGameState, 2000);
+checkTurnPoller = setInterval(checkTurn, 5000);
+function createPiece(playerID) {
+
+    if (document.getElementsByClassName('unplayedPiece').length < 1) {
+        var piece = document.createElementNS(svgns, "circle");
+        piece.setAttributeNS(null, "r", "25");
+        piece.setAttributeNS(null, "cx", "40");
+        piece.setAttributeNS(null, "cy", "40");
+        if (playerID == 1) {
+            piece.setAttributeNS(null, "fill", "red");
+        }
+        else {
+            piece.setAttributeNS(null, "fill", "black");
+        }
+
+        piece.setAttributeNS(null, "r", "25");
+        piece.setAttributeNS(null, "class", "unplayedPiece");
+        piece.setAttributeNS(null, "id", "piece_" + pieceCounter);
+        pieceCounter++;
+        piece.setAttributeNS(null, "onmousedown", "setDrag(this.id)");
+        document.getElementsByTagName('svg')[0].appendChild(piece);
+
+    }
+
+}
+
+function createOpponentPiece(cx, cy, playerID) {
 
     var piece = document.createElementNS(svgns, "circle");
+    if (playerID == 1) {
+        piece.setAttributeNS(null, "fill", "red");
+    }
+    else {
+        piece.setAttributeNS(null, "fill", "black");
+    }
+
     piece.setAttributeNS(null, "r", "25");
-    piece.setAttributeNS(null, "cx", "40");
-    piece.setAttributeNS(null, "cy", "40");
-    piece.setAttributeNS(null, "fill", "red");
-    piece.setAttributeNS(null, "r", "25");
-    piece.setAttributeNS(null, "id", "1");
-    piece.setAttributeNS(null, "onmousedown", "setDrag(this.id)");
+    // piece.setAttributeNS(null, "id", "1");
+    piece.setAttributeNS(null, "cx", cx);
+    piece.setAttributeNS(null, "cy", cy);
+    console.log("cx " + cx);
+    console.log("cy " + cy);
+    piece.setAttributeNS(null, "class", "playedPiece");
+    // piece.setAttributeNS(null, "id", "opponentPiece");
     document.getElementsByTagName('svg')[0].appendChild(piece);
 
 }
+function createPlayedPiece(cx, cy, playerID) {
 
-function createOpponentPiece(cx, cy) {
-
-    var piece = document.createElementNS(svgns, "circle");
-    piece.setAttributeNS(null, "r", "25");
-    piece.setAttributeNS(null, "cx", "40");
-    piece.setAttributeNS(null, "cy", "40");
-    piece.setAttributeNS(null, "fill", "black");
-    piece.setAttributeNS(null, "r", "25");
-    piece.setAttributeNS(null, "id", "1");
-    piece.setAttributeNS(null, "cx", cx);
-    piece.setAttributeNS(null, "cy", cy);
-    piece.setAttributeNS(null,"class","playedPiece");
-    document.getElementsByTagName('svg')[0].appendChild(piece);
-
-}
-function createPlayedPiece(cx, cy) {
 
     var piece = document.createElementNS(svgns, "circle");
     piece.setAttributeNS(null, "r", "25");
-    piece.setAttributeNS(null, "cx", "40");
-    piece.setAttributeNS(null, "cy", "40");
-    piece.setAttributeNS(null, "fill", "red");
+    if (playerID == 1) {
+        piece.setAttributeNS(null, "fill", "red");
+    }
+    else {
+        piece.setAttributeNS(null, "fill", "black");
+    }
     piece.setAttributeNS(null, "r", "25");
-    piece.setAttributeNS(null, "id", "1");
     piece.setAttributeNS(null, "cx", cx);
     piece.setAttributeNS(null, "cy", cy);
-    piece.setAttributeNS(null,"class","playedPiece");
+    piece.setAttributeNS(null, "class", "playedPiece");
+    // piece.setAttributeNS(null, "id", "myPiece");
     document.getElementsByTagName('svg')[0].appendChild(piece);
 
 }
 function updateBoard(boardArr) {
-    [].forEach.call(document.querySelectorAll('.playedPiece'),function(e){
+    [].forEach.call(document.querySelectorAll('.playedPiece'), function (e) {
         e.parentNode.removeChild(e);
-      });
-    boardArr = new Array();
-    for (var i = 0; i < 6; i++) {
-        subArray = new Array();
-        for (var j = 0; j < 7; j++) {
-            var random = Math.random();
-            if (random < .5) {
-                random = 1;
-            }
-            else {
-                random = 2;
-            }
-            subArray[j] = random;
-        }
-        boardArr[i] = subArray;
-    }
-    for (var i = 0; i < boardArr.length; i++) {
-        for (var j = 0; j < boardArr[i].length; j++) {
-            var cx = (j * 80) + 40;
-            var cy = (i * 80) + 120;
-            if(boardArr[i][j] == 1) {
-                createPlayedPiece(cx,cy);
-            }
-            else if(boardArr[i][j] == 2){
-                createOpponentPiece(cx,cy);
-            }
+    });
+    // boardArr = new Array();
+    // for (var i = 0; i < 6; i++) {
+    //     subArray = new Array();
+    //     for (var j = 0; j < 7; j++) {
+    //         var random = Math.random();
+    //         if (random < .5) {
+    //             random = 1;
+    //         }
+    //         else {
+    //             random = 2;
+    //         }
+    //         subArray[j] = random;
+    //     }
+    //     boardArr[i] = subArray;
+    // }
+    if (typeof boardArr != 'undefined') {
+        console.log(JSON.parse(boardArr));
+        var parseBoard = JSON.parse(boardArr);
+        for (var i = 0; i < parseBoard.length; i++) {
+            for (var j = 0; j < parseBoard[i].length; j++) {
+                var cx = (j * 80) + 40;
+                var cy = (i * 80) + 40;
+                if (parseInt(parseBoard[i][j]) == 1) {
+                    createPlayedPiece(cx, cy, 1);
+                    console.log("createPlayedPiece(cx, cy);");
+                }
+                else if (parseInt(parseBoard[i][j]) == 2) {
+                    createOpponentPiece(cx, cy, 2);
+                    console.log("createOpponentPiece(cx, cy);");
+                }
 
+            }
         }
     }
+
 
 
 }
@@ -128,7 +157,7 @@ function drag(evt) {
     if (mover != '') {
         var me = document.getElementById(mover);
         var board = $('.boardContainer svg').position();
-        console.log(evt.clientX - board.left);
+        // console.log(evt.clientX - board.left);
         me.setAttribute('cx', (evt.clientX - board.left));
         me.setAttribute('cy', (evt.clientY - board.top + $(window).scrollTop()));
     }
@@ -136,18 +165,47 @@ function drag(evt) {
 
     }
 }
+function playPiece(ele) {
+    var pieceData = {
+        game_id: gameid,
+        xcoord: ele,
+        _token: $('meta[name="csrf-token"]').attr('content')
+    };
+    $.ajax({
+        type: "POST",
+        async: true,
+        cache: false,
+        url: baseurl + "playPiece",
+        dataType: "json",
+        data: pieceData,
+        success: function (data) {
+            console.log("playPiece");
+            console.log(data);
+            [].forEach.call(document.querySelectorAll('.unplayedPiece'), function (e) {
+                e.parentNode.removeChild(e);
+            });
 
+        },
+        failure: function (err) {
+            console.log(err);
+
+
+        },
+
+    });
+}
 function releaseDrag(evt) {
     if (mover != '') {
         //when i fire am i on a good space? (a cell)
-        console.log(evt);
-        var curX = parseInt(document.getElementById(mover).getAttributeNS(null, 'cx'));
-        var curY = parseInt(document.getElementById(mover).getAttributeNS(null, 'cy'));
+
+        var curX = evt.target.getAttribute('cx');
         document.getElementById(mover).setAttributeNS(null, 'cy', '40');
-        var currentX = (curX / 80) + 40
+
+        var currentX = (parseInt(curX / 80) * 80) + 40;
         document.getElementById(mover).setAttributeNS(null, 'cx', currentX);
 
         mover = '';
+        //   document.getElementsByClassName('unplayedPiece')[0].remove();
         //check to see if this point is insde of a cell
         // var hit = checkHit(curX,curY);
         // if(hit) {
@@ -181,9 +239,53 @@ function getGameState() {
                 window.location = "/laravelProject/public/home";
             }
             updateBoard(data.data[0].boardArray);
+
         },
         failure: function (err) {
             console.log(err);
+
+        },
+
+    });
+}
+
+function checkTurn() {
+    $.ajax({
+        type: "POST",
+        async: true,
+        cache: false,
+        url: baseurl + "checkTurn",
+        dataType: "json",
+        data: game,
+        success: function (data) {
+            console.log("checkTurn");
+            console.log(data);
+            if (data.success == false) {
+                [].forEach.call(document.querySelectorAll('.unplayedPiece'), function (e) {
+                    e.parentNode.removeChild(e);
+                });
+                $('#whosTurn').text('opponents turn');
+
+
+            }
+            else {
+                $('#whosTurn').text('your turn');
+                if (document.getElementById("piece_0") == null) {
+                    console.log("append piece here");
+                    if (data.data.playerTurn == data.data.player1ID) {
+                        createPiece(1);
+                    }
+                    else if (data.data.playerTurn == data.data.player2ID) {
+                        createPiece(2);
+                    }
+
+                }
+            }
+
+        },
+        failure: function (err) {
+            console.log(err);
+
 
         },
 
@@ -194,23 +296,23 @@ function forfeit() {
     console.log("forfeit");
     console.log(game);
 
-    $.ajax({
-        type: "POST",
-        async: true,
-        cache: false,
-        url: baseurl + "quitGame",
-        dataType: "json",
-        data: game,
-        success: function (data) {
-            console.log("forfeit");
-            console.log(data);
-        },
-        failure: function (err) {
-            console.log(err);
+    // $.ajax({
+    //     type: "POST",
+    //     async: true,
+    //     cache: false,
+    //     url: baseurl + "quitGame",
+    //     dataType: "json",
+    //     data: game,
+    //     success: function (data) {
+    //         console.log("forfeit");
+    //         console.log(data);
+    //     },
+    //     failure: function (err) {
+    //         console.log(err);
 
-        },
+    //     },
 
-    });
+    // });
 
 }
 $(window).on('beforeunload', function (evt) {
@@ -224,6 +326,20 @@ $(window).on('beforeunload', function (evt) {
 $(window).on('unload', function (evt) {
     forfeit();
 
+});
+$(document).on("dblclick", ".unplayedPiece", function (e) {
+
+    var dialog = confirm("are you sure you want to move here?");
+    if (dialog) {
+        // var square = parseInt(document.getElementById(mover).getAttribute('cx') / 80);
+        // playPiece(square);
+        var square = parseInt(document.getElementsByClassName('unplayedPiece')[0].getAttribute('cx') / 80);
+        playPiece(square);
+        $('.unplayedPiece').remove();
+    }
+    else {
+        return false;
+    }
 });
 
 $(document).ready(function () {

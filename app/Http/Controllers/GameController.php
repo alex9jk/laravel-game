@@ -167,6 +167,50 @@ class GameController extends Controller
 
     }
 
+    public function playPiece(Request $request){
+        $this->validate( $request,[
+            'xcoord' => 'required',
+            'game_id' => 'required'
+        ]);
+        $game = Game::where('id',"=",$request->game_id)->first();
+        $board = json_decode($game->boardArray);
+        $user = Auth::user(); 
+        if($user->id == $game->playerTurn){
+            if($game->player1ID == $user->id){
+                $playerNum = 1;
+                $game->playerTurn = $game->player2ID;
+            }
+            else if($game->player2ID == $user->id){
+                $playerNum = 2;
+                $game->playerTurn = $game->player1ID;
+    
+            }
+            if($board[0][$request->xcoord] == 0 && $playerNum != null){
+                for($i=sizeof($board) -1; $i>-1; $i--){
+                    if($board[$i][$request->xcoord] == 0){
+                        $board[$i][$request->xcoord] =$playerNum;
+                        $game->boardArray = json_encode($board); 
+                        $game->save();
+                        return response()->json([
+                            'success'  => true,
+                            'data' => $game
+                        
+                            ]);
+                    }
+                }
+
+            }
+            
+
+        }
+        return response()->json([
+            'success'  => false,
+            'data' => $game
+            ]);
+        
+
+    }
+
     public function updateBoard(Request $request){
         $this->validate( $request,[
             'board' => 'required',
@@ -176,6 +220,24 @@ class GameController extends Controller
     }
 
     public function checkTurn(Request $request){
+        $this->validate( $request,[
+            'id' => 'required'
+        ]);
+        $user = Auth::user(); 
+        $game = Game::where('id',"=",$request->id)->first();
+        if($user->id == $game->playerTurn){
+            return response()->json([
+                'success'  => true,
+                'data' => $game
+            
+                ]);
+        }
+        else {
+            return response()->json([
+                'success'  => false             
+                ]);
+        }
+
 
     }
     /**

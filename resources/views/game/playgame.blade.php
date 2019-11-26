@@ -5,6 +5,7 @@
     <div class="row justify-content-center">
         <div class="col-md-8">
                 <h2 class="header"><strong>Play Connect 4</strong></h2>
+                <div><h5 id="whosTurn"></h5></div>
         <div id= "wrapper">    
             <div id="grow">    
                 <div class="box">
