@@ -41,7 +41,6 @@
                     @endfor
                     </svg>
                 </div> 
-                    <h5 onclick="return createPiece();">create a piece</h5>
     
             </div>   
             </div>

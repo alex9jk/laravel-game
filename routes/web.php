@@ -51,6 +51,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('/updateBoard', 'GameController@updateBoard');
     Route::post('/checkTurn', 'GameController@checkTurn');
     Route::post('/playPiece', 'GameController@playPiece');
+    Route::post('/checkWinner', 'GameController@checkWinnerGame');
     
     
 

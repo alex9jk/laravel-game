@@ -81,13 +81,14 @@ function checkChat() {
         dataType: "json",
         data: csrf,
         success: function (data) {
-
-            var messageText = "";
-            for (var i = 0; i < data.data.length; i++) {
-                messageText += "<div class='messages'><strong>" + data.data[i].name[0].name + ": </strong>" + data.data[i].messageText + "</div>";
+            if (data.success) {
+                var messageText = "";
+                for (var i = 0; i < data.data.length; i++) {
+                    messageText += "<div class='messages'><strong>" + data.data[i].name[0].name + ": </strong>" + data.data[i].messageText + "</div>";
+                }
+                $('.box').html(messageText);
+                document.querySelector(".box").scrollTo(0, document.querySelector(".box").scrollHeight);
             }
-            $('.box').html(messageText);
-            document.querySelector(".box").scrollTo(0, document.querySelector(".box").scrollHeight);
         },
         failure: function (err) {
             console.log(err);
@@ -105,7 +106,7 @@ function checkLobbyUsers() {
         dataType: "json",
         data: csrf,
         success: function (data) {
-            console.log(data);
+            // console.log(data);
             if (data.success) {
                 var userName = "";
                 if (data.data.length > 0) {
@@ -137,7 +138,7 @@ function checkChallengeAccept() {
             console.log("checkChallengeAccepted");
             console.log(data);
             if (data.success) {
-               window.location.href = "playgame/"+data.data[0].id;
+                window.location.href = "playgame/" + data.data[0].id;
             }
 
         },
@@ -162,7 +163,7 @@ function checkChallenge() {
         success: function (data) {
 
             if (data.success) {
-                  clearInterval(challengePoller);
+                clearInterval(challengePoller);
                 var r = confirm("Do you want to play " + data.data.challenger + "?");
                 if (r == true) {
                     joinGame(data.data.id);
@@ -197,7 +198,7 @@ function joinGame(id) {
         success: function (data) {
             console.log(data);
             if (data.success) {
-                window.location.href = "playgame/"+id;
+                window.location.href = "playgame/" + id;
             }
         },
         failure: function (err) {

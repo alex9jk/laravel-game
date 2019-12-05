@@ -48,13 +48,14 @@ class HomeController extends Controller
 
         $this->validate( $request,[
             'message' => 'required',
+            
         ]);
         $user = Auth::user();
         
         $message = new Message();
         
         $message->user_id = $user->id;
-        $message->messageText = $request->message;
+        $message->messageText = strip_tags($request->message);
         $message->save();
         return response()->json([
             'success'  => true
@@ -70,6 +71,12 @@ class HomeController extends Controller
 
         $user = Auth::user();  
         $messages = Message::whereNull('game_id')->get();
+
+        if($messages == null || $messages->count() <1) {
+            return response()->json([
+                'success'  => false
+                ]);
+        }
         foreach($messages as $message){
             $message->name = User::where('id',"=",$user->id)->get();
         }

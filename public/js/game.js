@@ -57,8 +57,8 @@ function createOpponentPiece(cx, cy, playerID) {
     // piece.setAttributeNS(null, "id", "1");
     piece.setAttributeNS(null, "cx", cx);
     piece.setAttributeNS(null, "cy", cy);
-    console.log("cx " + cx);
-    console.log("cy " + cy);
+    // console.log("cx " + cx);
+    // console.log("cy " + cy);
     piece.setAttributeNS(null, "class", "playedPiece");
     // piece.setAttributeNS(null, "id", "opponentPiece");
     document.getElementsByTagName('svg')[0].appendChild(piece);
@@ -103,19 +103,19 @@ function updateBoard(boardArr) {
     //     boardArr[i] = subArray;
     // }
     if (typeof boardArr != 'undefined') {
-        console.log(JSON.parse(boardArr));
+        //console.log(JSON.parse(boardArr));
         var parseBoard = JSON.parse(boardArr);
         for (var i = 0; i < parseBoard.length; i++) {
             for (var j = 0; j < parseBoard[i].length; j++) {
                 var cx = (j * 80) + 40;
-                var cy = (i * 80) + 40;
+                var cy = (i * 80) + 120;
                 if (parseInt(parseBoard[i][j]) == 1) {
                     createPlayedPiece(cx, cy, 1);
-                    console.log("createPlayedPiece(cx, cy);");
+                    //  console.log("createPlayedPiece(cx, cy);");
                 }
                 else if (parseInt(parseBoard[i][j]) == 2) {
                     createOpponentPiece(cx, cy, 2);
-                    console.log("createOpponentPiece(cx, cy);");
+                    //  console.log("createOpponentPiece(cx, cy);");
                 }
 
             }
@@ -131,11 +131,11 @@ var mover = '';
 var myX, myY;
 function setDrag(id) {
     mover = id;
-    console.log(mover);
+    // console.log(mover);
     myX = document.getElementById(mover).getAttributeNS(null, 'cx');
     myY = document.getElementById(mover).getAttributeNS(null, 'cy');
-    console.log(myX);
-    console.log(myY);
+    // console.log(myX);
+    // console.log(myY);
 }
 function move(evt) {
     //console.log(evt);
@@ -234,9 +234,15 @@ function getGameState() {
         success: function (data) {
             console.log(data);
             if (data.data[0].gameState == "forfeit") {
-                clearInterval(gameStatePoller);
-                var r = confirm("Opponent has forfeited");
-                window.location = "/laravelProject/public/home";
+                checkForfeit();
+
+
+                //call check forfeit 
+
+
+            }
+            else if (data.data[0].gameState == "ended") {
+                checkWinner();
             }
             updateBoard(data.data[0].boardArray);
 
@@ -249,6 +255,89 @@ function getGameState() {
     });
 }
 
+function checkWinner() {
+    $.ajax({
+        type: "POST",
+        async: true,
+        cache: false,
+        url: baseurl + "checkWinner",
+        dataType: "json",
+        data: game,
+        success: function (data) {
+            console.log("checkWinner");
+            console.log(data);
+
+            if (data.success == true) {
+                clearInterval(chatGamePoller);
+                clearInterval(gameStatePoller);
+                clearInterval(checkTurnPoller);
+                if (data.winner == true) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Connect 4!',
+                        text: 'You Won!'
+                    });
+                }
+                else if (data.winner == false) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oh no!',
+                        text: 'You Lost!'
+                    });
+                }
+                // window.location = "/laravelProject/public/home";
+            }
+
+            // updateBoard(data.data[0].boardArray);
+
+        },
+        failure: function (err) {
+            console.log(err);
+
+        },
+
+    });
+}
+
+function checkForfeit(){
+    $.ajax({
+        type: "POST",
+        async: true,
+        cache: false,
+        url: baseurl + "checkWinner",
+        dataType: "json",
+        data: game,
+        success: function (data) {
+            console.log("check Forfeit");
+            console.log(data);
+
+            if (data.success == false) {
+                clearInterval(chatGamePoller);
+                clearInterval(gameStatePoller);
+                clearInterval(checkTurnPoller);
+                if (data.winner == true) {
+                    Swal.fire("Opponent has forfeited");
+                    setTimeout(function () { window.location = "/laravelProject/public/home"; }, 10000);
+                }
+                else if (data.winner == false) {
+                    Swal.fire("You have forfeited the game");
+                    setTimeout(function () { window.location = "/laravelProject/public/home"; }, 10000);
+                }
+                // window.location = "/laravelProject/public/home";
+            }
+
+            // updateBoard(data.data[0].boardArray);
+
+        },
+        failure: function (err) {
+            console.log(err);
+
+        },
+
+    });
+    
+}
+
 function checkTurn() {
     $.ajax({
         type: "POST",
@@ -258,8 +347,8 @@ function checkTurn() {
         dataType: "json",
         data: game,
         success: function (data) {
-            console.log("checkTurn");
-            console.log(data);
+            // console.log("checkTurn");
+            // console.log(data);
             if (data.success == false) {
                 [].forEach.call(document.querySelectorAll('.unplayedPiece'), function (e) {
                     e.parentNode.removeChild(e);
@@ -271,7 +360,7 @@ function checkTurn() {
             else {
                 $('#whosTurn').text('your turn');
                 if (document.getElementById("piece_0") == null) {
-                    console.log("append piece here");
+                    // console.log("append piece here");
                     if (data.data.playerTurn == data.data.player1ID) {
                         createPiece(1);
                     }
@@ -296,23 +385,23 @@ function forfeit() {
     console.log("forfeit");
     console.log(game);
 
-    // $.ajax({
-    //     type: "POST",
-    //     async: true,
-    //     cache: false,
-    //     url: baseurl + "quitGame",
-    //     dataType: "json",
-    //     data: game,
-    //     success: function (data) {
-    //         console.log("forfeit");
-    //         console.log(data);
-    //     },
-    //     failure: function (err) {
-    //         console.log(err);
+    $.ajax({
+        type: "POST",
+        async: true,
+        cache: false,
+        url: baseurl + "quitGame",
+        dataType: "json",
+        data: game,
+        success: function (data) {
+            console.log("forfeit");
+            console.log(data);
+        },
+        failure: function (err) {
+            console.log(err);
 
-    //     },
+        },
 
-    // });
+    });
 
 }
 $(window).on('beforeunload', function (evt) {

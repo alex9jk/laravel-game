@@ -29,10 +29,10 @@ class GameController extends Controller
         //set values in array to 0
         //JSON.stringify()
         $boardArray = array();
-        for($i=0;$i<7;$i++){
+        for($i=0;$i<6;$i++){
             $subArray = array();
             
-            for($j=0;$j<6;$j++){
+            for($j=0;$j<7;$j++){
                 $subArray[$j] = 0;
             }
             $boardArray[$i] = $subArray;
@@ -77,7 +77,7 @@ class GameController extends Controller
         $message = new Message();
         
         $message->user_id = $user->id;
-        $message->messageText = $request->message;
+        $message->messageText = strip_tags($request->message);
         $message->game_id = $request->gameid;
         $message->save();
         return response()->json([
@@ -166,6 +166,117 @@ class GameController extends Controller
     public function isLegaLMove(Request $request){
 
     }
+    public function checkWinner($board){
+        $win = false;
+        if($win == false){
+            $win =  $this->northWest($board);
+        }
+        if($win == false){
+            $win =  $this->northEast($board);
+        }
+        if($win == false){
+            $win =  $this->checkHorizontal($board);
+        }
+        if($win == false){
+            $win =  $this->checkVertical($board);
+        }
+        return $win;
+
+
+    }
+    public function northWest($board){
+        for($x =sizeof($board[0])-1; $x>=0;$x--){ 
+          for($y = sizeof($board) -1; $y>=0; $y--){
+            if(isset($board[$y][$x]) && $board[$y][$x] == "1" && isset($board[$y-1][$x-1]) && $board[$y-1][$x-1] == "1" && isset($board[$y-2][$x-2]) && $board[$y-2][$x-2] == "1" && isset($board[$y-3][$x-3]) && $board[$y-3][$x-3] == "1" ){
+              return 1;
+            }
+            if(isset($board[$y][$x]) && $board[$y][$x] == "2" && isset($board[$y-1][$x-1]) && $board[$y-1][$x-1] == "2" && isset($board[$y-2][$x-2]) && $board[$y-2][$x-2] == "2" && isset($board[$y-3][$x-3]) && $board[$y-3][$x-3] == "2" ){
+                return 2;
+              }
+          }
+        }
+        return false;
+    
+      }
+      public function northEast($board){
+        for($x =sizeof($board[0])-1; $x>=0;$x--){
+          for($y = sizeof($board) -1; $y>=0; $y--){
+            if(isset($board[$y][$x]) && $board[$y][$x] == "1" && isset($board[$y-1][$x+1]) && $board[$y-1][$x+1] == "1" && isset($board[$y-2][$x+2]) && $board[$y-2][$x+2] == "1" && isset($board[$y-3][$x+3]) && $board[$y-3][$x+3] == "1" ){
+              return 1;
+            }
+            if(isset($board[$y][$x]) && $board[$y][$x] == "2" && isset($board[$y-1][$x+1]) && $board[$y-1][$x+1] == "2" && isset($board[$y-2][$x+2]) && $board[$y-2][$x+2] == "2" && isset($board[$y-3][$x+3]) && $board[$y-3][$x+3] == "2" ){
+                return 2;
+              }
+          }
+        }
+        return false;
+    
+      }
+    public function checkHorizontal($board) {
+
+        for($y = sizeof($board) -1; $y>=0; $y--){
+            $counter =0;
+            $counter2=0;
+              for($x =sizeof($board[$y])-1; $x>=0;$x--){
+                  if(isset($board[$y][$x]) && $board[$y][$x] == "1"){
+                    $counter++;
+                  }
+                  if(isset($board[$y][$x]) && $board[$y][$x] == "2"){
+                    $counter2++;
+                  }
+                  if(!isset($board[$y][$x]) && $board[$y][$x] != "2"){
+                    $counter2 = 0;
+                    
+                  }
+                  if(!isset($board[$y][$x]) && $board[$y][$x] != "1"){
+                    $counter = 0;
+                  }    
+                  if($counter == 4){
+                    return 1;
+                    break;
+                  }
+                  if($counter2 ==4){
+                    return 2;
+                  break;
+                  }
+
+              }     
+          }
+        return false;
+    
+      }
+
+      public function checkVertical($board) {
+        for($x =sizeof($board[0])-1; $x>=0;$x--){
+            $counter =0;
+            $counter2 =0;
+            for($y = sizeof($board) -1; $y>=0; $y--){
+              if(isset($board[$y][$x]) && $board[$y][$x] == "1"){
+                $counter++;
+              }
+              if(isset($board[$y][$x]) && $board[$y][$x] == "2"){
+                $counter2++;
+              }
+              if(!isset($board[$y][$x]) && $board[$y][$x] != "2"){
+                $counter2 = 0;
+                
+              }
+              if(!isset($board[$y][$x]) && $board[$y][$x] != "1"){
+                $counter = 0;
+              }
+              if($counter2 == 4) {
+                return 2;
+                break;
+              }
+              if($counter == 4){
+                return 1;
+                break;
+              }   
+            }
+          }   
+        return false;
+      }
+
 
     public function playPiece(Request $request){
         $this->validate( $request,[
@@ -189,7 +300,18 @@ class GameController extends Controller
                 for($i=sizeof($board) -1; $i>-1; $i--){
                     if($board[$i][$request->xcoord] == 0){
                         $board[$i][$request->xcoord] =$playerNum;
-                        $game->boardArray = json_encode($board); 
+                        $game->boardArray = json_encode($board);
+                        $checkWin = $this->checkWinner($board);
+                        if($checkWin != false){
+                            if($checkWin == 1){
+                                $game->winner = $game->player1ID;
+                            }
+                            else if($checkWin == 2){
+                                $game->winner = $game->player2ID;
+                            }
+                            $game->gameState = "ended";
+                            $game->playerTurn = null;
+                        } 
                         $game->save();
                         return response()->json([
                             'success'  => true,
@@ -238,6 +360,43 @@ class GameController extends Controller
                 ]);
         }
 
+    }
+    public function checkWinnerGame(Request $request) {
+        $this->validate( $request,[
+            'id' => 'required'
+        ]);
+        $user = Auth::user(); 
+        $game = Game::where('id',"=",$request->id)->first();
+        if($game->gameState == "ended" && $game->winner == $user->id){
+            return response()->json([
+                'success'  => true,
+                'winner' => true             
+                ]);
+        }
+        else if($game->gameState == "ended" && $game->winner != $user->id){
+            return response()->json([
+                'success'  => true,
+                'winner' => false             
+                ]);
+        }
+        else if($game->gameState == "forfeit" && $game->winner == $user->id){
+            return response()->json([
+                'success'  => false,
+                'winner' => true           
+                ]);
+        }
+        else if($game->gameState == "forfeit" && $game->winner != $user->id){
+            return response()->json([
+                'success'  => false,
+                'winner' => false           
+                ]);
+        }
+        else if($game->gameState != "ended"){
+            return response()->json([
+                'success'  => false,
+                "data" => $game           
+                ]);
+        }
 
     }
     /**
