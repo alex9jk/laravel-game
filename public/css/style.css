@@ -13,7 +13,10 @@
   display:flex;
 }
 #grow {
-  flex-grow: 1;
+  flex-grow: 2;
+}
+#stretch{
+  width:400px;
 }
 .outer{
   flex-grow: .75;

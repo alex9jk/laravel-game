@@ -7,7 +7,7 @@
                 <h2 class="header"><strong>Play Connect 4</strong></h2>
                 <div><h5 id="whosTurn"></h5></div>
         <div id= "wrapper">    
-            <div id="grow">    
+            <div>    
                 <div class="box">
                     @if (session('status'))
                         <div class="alert alert-success" role="alert">
@@ -15,11 +15,11 @@
                         </div>
                     @endif            
                 </div>
-                <div>
+                <div id ="stretch">
                     <form method="POST" class="chatSend">
-                        <input type="text" id="messageBox" name="message" min="50" />
+                        <input type="text" id="messageBox" name="message" min="50" class="form-control" />
                         <input type="hidden" name="_token" value="{{ csrf_token() }}" />
-                        <input type="submit" name="chat" value="send"/>
+                        <input type="submit" name="chat" value="send" class="submit btn btn-primary"/>
                         <input type="hidden" name= "gameid"value="{{$game->id}}" />
                     </form>
                 </div>
@@ -41,10 +41,10 @@
                     @endfor
                     </svg>
                 </div> 
-    
+                
             </div>   
-            </div>
         </div>
+    </div>
 </div>
 
 <script>var gameid="{{$game->id}}";</script>

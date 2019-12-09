@@ -20,6 +20,8 @@ class GameController extends Controller
     public function index($id)
     {
         $user = Auth::user();
+        $user->playerStatus = "playing";
+        $user->save();
         $game = Game::where('gameState', '=', 'playing')->where('player1ID','=',$user->id)->orWhere('player2ID','=',$user->id)->first();
         $userArray = array($game->player1ID,$game->player2ID);
         $random = Arr::random($userArray);
@@ -214,67 +216,35 @@ class GameController extends Controller
       }
     public function checkHorizontal($board) {
 
-        for($y = sizeof($board) -1; $y>=0; $y--){
-            $counter =0;
-            $counter2=0;
-              for($x =sizeof($board[$y])-1; $x>=0;$x--){
-                  if(isset($board[$y][$x]) && $board[$y][$x] == "1"){
-                    $counter++;
-                  }
-                  if(isset($board[$y][$x]) && $board[$y][$x] == "2"){
-                    $counter2++;
-                  }
-                  if(!isset($board[$y][$x]) && $board[$y][$x] != "2"){
-                    $counter2 = 0;
-                    
-                  }
-                  if(!isset($board[$y][$x]) && $board[$y][$x] != "1"){
-                    $counter = 0;
-                  }    
-                  if($counter == 4){
-                    return 1;
-                    break;
-                  }
-                  if($counter2 ==4){
-                    return 2;
-                  break;
-                  }
-
-              }     
+        for($x =sizeof($board[0])-1; $x>=0;$x--){
+            for($y = sizeof($board) -1; $y>=0; $y--){
+              if(isset($board[$y][$x]) && $board[$y][$x] == "1" && isset($board[$y][$x-1]) && $board[$y][$x-1] == "1" && isset($board[$y][$x-2]) && $board[$y][$x-2] == "1" && isset($board[$y][$x-3]) && $board[$y][$x-3] == "1" ){
+                return 1;
+              }
+              if(isset($board[$y][$x]) && $board[$y][$x] == "2" && isset($board[$y][$x-1]) && $board[$y][$x-1] == "2" && isset($board[$y][$x-2]) && $board[$y][$x-2] == "2" && isset($board[$y][$x-3]) && $board[$y][$x-3] == "2" ){
+                  return 2;
+                }
+            }
           }
-        return false;
+          return false;
+      
     
       }
 
       public function checkVertical($board) {
         for($x =sizeof($board[0])-1; $x>=0;$x--){
-            $counter =0;
-            $counter2 =0;
             for($y = sizeof($board) -1; $y>=0; $y--){
-              if(isset($board[$y][$x]) && $board[$y][$x] == "1"){
-                $counter++;
-              }
-              if(isset($board[$y][$x]) && $board[$y][$x] == "2"){
-                $counter2++;
-              }
-              if(!isset($board[$y][$x]) && $board[$y][$x] != "2"){
-                $counter2 = 0;
-                
-              }
-              if(!isset($board[$y][$x]) && $board[$y][$x] != "1"){
-                $counter = 0;
-              }
-              if($counter2 == 4) {
-                return 2;
-                break;
-              }
-              if($counter == 4){
+              if(isset($board[$y][$x]) && $board[$y][$x] == "1" && isset($board[$y-1][$x]) && $board[$y-1][$x] == "1" && isset($board[$y-2][$x]) && $board[$y-2][$x] == "1" && isset($board[$y-3][$x]) && $board[$y-3][$x] == "1" ){
                 return 1;
-                break;
-              }   
+              }
+              if(isset($board[$y][$x]) && $board[$y][$x] == "2" && isset($board[$y-1][$x]) && $board[$y-2][$x] == "2" && isset($board[$y-2][$x]) && $board[$y-2][$x] == "2" && isset($board[$y-3][$x]) && $board[$y-3][$x] == "2" ){
+                  return 2;
+                }
             }
-          }   
-        return false;
+          }
+          return false;
+      
+    
       }
 
 

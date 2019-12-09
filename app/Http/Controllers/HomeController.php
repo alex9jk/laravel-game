@@ -32,6 +32,7 @@ class HomeController extends Controller
         $user = Auth::user();
         //\DB::table('games')->where('gameState', '=', 'challenge')->where('player1ID','=',$user->id)->orWhere('player2ID','=',$user->id)->delete();
         $user->playerStatus = "waiting";
+        $user->touch();
         $user->save();
         $messages = Message::whereNull('game_id')->get();
         $games = \DB::table('games')->where('player1ID','=',$user->id)->orWhere('player2ID','=',$user->id)->get();
@@ -94,7 +95,7 @@ class HomeController extends Controller
     public function getLobbyUsers(Request $request){
 
         $user = Auth::user();  
-        $waitingUsers = User::where('id',"!=",$user->id)->where("playerStatus","=","waiting")->get();
+        $waitingUsers = User::where('id',"!=",$user->id)->where("playerStatus","=","waiting")->whereBetween('updated_at', [now()->subMinutes(30), now()])->get();
 
         if($waitingUsers == null || $waitingUsers->count() < 1){
             return response()->json([

@@ -22,7 +22,7 @@ function createPiece(playerID) {
 
     if (document.getElementsByClassName('unplayedPiece').length < 1) {
         var piece = document.createElementNS(svgns, "circle");
-        piece.setAttributeNS(null, "r", "25");
+        piece.setAttributeNS(null, "r", "26");
         piece.setAttributeNS(null, "cx", "40");
         piece.setAttributeNS(null, "cy", "40");
         if (playerID == 1) {
@@ -32,7 +32,7 @@ function createPiece(playerID) {
             piece.setAttributeNS(null, "fill", "black");
         }
 
-        piece.setAttributeNS(null, "r", "25");
+        piece.setAttributeNS(null, "r", "26");
         piece.setAttributeNS(null, "class", "unplayedPiece");
         piece.setAttributeNS(null, "id", "piece_" + pieceCounter);
         pieceCounter++;
@@ -53,7 +53,7 @@ function createOpponentPiece(cx, cy, playerID) {
         piece.setAttributeNS(null, "fill", "black");
     }
 
-    piece.setAttributeNS(null, "r", "25");
+    piece.setAttributeNS(null, "r", "26");
     // piece.setAttributeNS(null, "id", "1");
     piece.setAttributeNS(null, "cx", cx);
     piece.setAttributeNS(null, "cy", cy);
@@ -68,14 +68,14 @@ function createPlayedPiece(cx, cy, playerID) {
 
 
     var piece = document.createElementNS(svgns, "circle");
-    piece.setAttributeNS(null, "r", "25");
+    piece.setAttributeNS(null, "r", "26");
     if (playerID == 1) {
         piece.setAttributeNS(null, "fill", "red");
     }
     else {
         piece.setAttributeNS(null, "fill", "black");
     }
-    piece.setAttributeNS(null, "r", "25");
+    piece.setAttributeNS(null, "r", "26");
     piece.setAttributeNS(null, "cx", cx);
     piece.setAttributeNS(null, "cy", cy);
     piece.setAttributeNS(null, "class", "playedPiece");
@@ -443,7 +443,7 @@ $(document).ready(function () {
             data: $(this).serialize(),
             success: function (data) {
 
-                $('#messageInput').val('');
+                $('#messageBox').val('');
                 checkGameChat();
             },
             failure: function (err) {
