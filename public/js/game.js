@@ -274,9 +274,10 @@ function checkWinner() {
                 if (data.winner == true) {
                     Swal.fire({
                         icon: 'success',
-                        title: 'Connect 4!',
+                        title: 'Connect Four!',
                         text: 'You Won!'
                     });
+                    setTimeout(function () { window.location = "/laravelProject/public/home"; }, 10000);
                 }
                 else if (data.winner == false) {
                     Swal.fire({
@@ -284,8 +285,10 @@ function checkWinner() {
                         title: 'Oh no!',
                         text: 'You Lost!'
                     });
+                    setTimeout(function () { window.location = "/laravelProject/public/home"; }, 10000);
                 }
-                // window.location = "/laravelProject/public/home";
+                
+
             }
 
             // updateBoard(data.data[0].boardArray);

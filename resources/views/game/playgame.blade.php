@@ -2,9 +2,9 @@
 
 @section('content')
 <div class="container">
-    <div class="row justify-content-center">
+    <div class="row ">
         <div class="col-md-8">
-                <h2 class="header"><strong>Play Connect 4</strong></h2>
+                <h2 class="header"><strong>Play Connect Four</strong></h2>
                 <div><h5 id="whosTurn"></h5></div>
         <div id= "wrapper">    
             <div>    

@@ -39,6 +39,12 @@ class HomeController extends Controller
         return view('home',['user'=>$user,'messages'=>$messages,'games' =>$games]);
     }
 
+    public function profile(){
+        $user = Auth::user();
+        $games = \DB::table('games')->where('player1ID','=',$user->id)->orWhere('player2ID','=',$user->id)->get();
+        return view('profile',['user'=>$user,'games' =>$games]);
+    }
+
         /**
      * 
      *Posts message to lobby chat from form

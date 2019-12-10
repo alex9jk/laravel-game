@@ -11,13 +11,17 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Route::get('/', function () {
+//     return view('welcome');
+// });
 
 Auth::routes();
+Route::get('/home', 'HomeController@index')->name('home');
 
 Route::group(['middleware' => 'auth'], function () { 
+
+
+    
     Route::get('/playgame/{id}', [
         'uses'=>'GameController@index',
         'as' => 'game.playgame'
@@ -52,10 +56,12 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('/checkTurn', 'GameController@checkTurn');
     Route::post('/playPiece', 'GameController@playPiece');
     Route::post('/checkWinner', 'GameController@checkWinnerGame');
+
+    Route::get('/', 'HomeController@profile')->name('profile');
     
     
 
     
 });
-Route::get('/home', 'HomeController@index')->name('home');
+
 
