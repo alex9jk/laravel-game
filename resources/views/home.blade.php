@@ -27,7 +27,9 @@
                     <h5>Available Users to Play</h5>
                     <div id="waiting-users"></div>
                 </div>
-            </div>  
+                
+            </div>
+            
             </div>
 
         </div>

@@ -15,6 +15,12 @@
 #grow {
   flex-grow: 2;
 }
+#tableHead{
+  text-align: center;
+}
+table {
+  margin-top: 1em;
+}
 #stretch{
   width:400px;
 }
@@ -54,9 +60,7 @@
   .messages{
     padding:.5em;
   }
-  table {
-    margin-top: 8em;
-  }
+
   .submit {
     margin-top: .2em 0 0 .2em;
   }

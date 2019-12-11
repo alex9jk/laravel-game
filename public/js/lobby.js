@@ -68,7 +68,7 @@ $(document).ready(function () {
     });
 
 
-
+    
 });
 
 //polls database to see if there are new chat messages

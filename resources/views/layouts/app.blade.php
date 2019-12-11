@@ -17,6 +17,8 @@
   crossorigin="anonymous"></script>
     
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+  <!-- <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>  -->
+
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
@@ -24,6 +26,8 @@
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <link href="{{ asset('css/style.css') }}" rel="stylesheet">
+    <!-- <link href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css" rel="stylesheet"> -->
+    
 </head>
 <body>
     <div id="app">

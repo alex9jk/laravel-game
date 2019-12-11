@@ -18,6 +18,7 @@ checkGameChat();
 chatGamePoller = setInterval(checkGameChat, 1000);
 gameStatePoller = setInterval(getGameState, 2000);
 checkTurnPoller = setInterval(checkTurn, 5000);
+
 function createPiece(playerID) {
 
     if (document.getElementsByClassName('unplayedPiece').length < 1) {
