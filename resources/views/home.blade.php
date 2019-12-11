@@ -29,7 +29,7 @@
                 </div>
                 
             </div>
-            
+            <a href="../public" class="btn btn-primary">Go back to Game Table</a>  
             </div>
 
         </div>

@@ -67,3 +67,6 @@ table {
   .btn-primary {
     margin-left:.5em;
   }
+  #messText {
+    padding:.5em;
+  }

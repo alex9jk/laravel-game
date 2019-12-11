@@ -478,7 +478,7 @@ function checkGameChat() {
                 if (data.data.length > 0) {
                     var messageText = "";
                     for (var i = 0; i < data.data.length; i++) {
-                        messageText += "<div><strong>" + data.data[i].name + ": </strong> " + data.data[i].messageText + "</div>";
+                        messageText += "<div id = 'messText'><strong>" + data.data[i].name + ": </strong> " + data.data[i].messageText + "</div>";
                     }
                     $('.box').html(messageText);
                 }
