@@ -41,7 +41,7 @@ class GameController extends Controller
         }
         $game->boardArray = json_encode($boardArray);
         $game->save();
-        if($game == null || $game->count() != 1){
+        if($game == null){
             return redirect('/home');
         }
         
@@ -132,7 +132,7 @@ class GameController extends Controller
 
         }
         $game->save();
-        if($game == null || $game->count() != 1 || $game->winner == null){
+        if($game == null || $game->winner == null){
             return response()->json([
                 'success'  => false
                 
@@ -165,9 +165,12 @@ class GameController extends Controller
         ]);
     }
 
-    public function isLegaLMove(Request $request){
-
-    }
+                    /**
+     * 
+     *checks the winner of the game by calling all connect 4 checks
+     * @param board array
+     * @return 1 for player 1 connect 4 and 2 for player 2  connect 4
+     */
     public function checkWinner($board){
         $win = false;
         if($win == false){
@@ -186,6 +189,13 @@ class GameController extends Controller
 
 
     }
+
+                /**
+     * 
+     *checks whether there is connect 4 match diagnolly from top left to bottom right
+     * @param board array
+     * @return 1 for player 1 connect 4 and 2 for player 2  connect 4
+     */
     public function northWest($board){
         for($x =sizeof($board[0])-1; $x>=0;$x--){ 
           for($y = sizeof($board) -1; $y>=0; $y--){
@@ -200,6 +210,13 @@ class GameController extends Controller
         return false;
     
       }
+
+                      /**
+     * 
+     *checks whether there is connect 4 match diagnolly from top right to bottom left
+     * @param board array
+     * @return 1 for player 1 connect 4 and 2 for player 2  connect 4
+     */
       public function northEast($board){
         for($x =sizeof($board[0])-1; $x>=0;$x--){
           for($y = sizeof($board) -1; $y>=0; $y--){
@@ -214,6 +231,12 @@ class GameController extends Controller
         return false;
     
       }
+                      /**
+     * 
+     *checks whether there is connect 4 match horizontally
+     * @param board array
+     * @return 1 for player 1 connect 4 and 2 for player 2  connect 4
+     */
     public function checkHorizontal($board) {
 
         for($x =sizeof($board[0])-1; $x>=0;$x--){
@@ -231,6 +254,12 @@ class GameController extends Controller
     
       }
 
+                      /**
+     * 
+     *checks whether there is connect 4 match vertically
+     * @param board array
+     * @return 1 for player 1 connect 4 and 2 for player 2  connect 4
+     */
       public function checkVertical($board) {
         for($x =sizeof($board[0])-1; $x>=0;$x--){
             for($y = sizeof($board) -1; $y>=0; $y--){
@@ -292,7 +321,6 @@ class GameController extends Controller
                 }
 
             }
-            
 
         }
         return response()->json([

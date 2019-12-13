@@ -46,7 +46,10 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('/challengeUser', 'HomeController@challengeUser');
     Route::post('/getChallenges', 'HomeController@getChallenges');
     Route::post('/joinGame', 'HomeController@joinGame');
-
+    Route::post('/denyGame', 'HomeController@denyGame');
+    Route::post('/userInactive', 'HomeController@userInactive');
+    
+    
     Route::post('/getGameChat', 'GameController@getLobbyMessages');
     Route::post('/sendGameData', 'GameController@chat');
     Route::post('/quitGame', 'GameController@quitGame');
@@ -56,6 +59,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('/checkTurn', 'GameController@checkTurn');
     Route::post('/playPiece', 'GameController@playPiece');
     Route::post('/checkWinner', 'GameController@checkWinnerGame');
+
+
 
     Route::get('/', 'HomeController@profile')->name('profile');
     

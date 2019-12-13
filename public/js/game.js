@@ -1,8 +1,6 @@
 
 
 var messages = {
-    // message: message,
-    // user_id:user_id,
     gameid: gameid,
     _token: $('meta[name="csrf-token"]').attr('content')
 };
@@ -19,6 +17,7 @@ chatGamePoller = setInterval(checkGameChat, 1000);
 gameStatePoller = setInterval(getGameState, 2000);
 checkTurnPoller = setInterval(checkTurn, 5000);
 
+//creates playable piece when players turn
 function createPiece(playerID) {
 
     if (document.getElementsByClassName('unplayedPiece').length < 1) {
@@ -33,7 +32,6 @@ function createPiece(playerID) {
             piece.setAttributeNS(null, "fill", "black");
         }
 
-        piece.setAttributeNS(null, "r", "26");
         piece.setAttributeNS(null, "class", "unplayedPiece");
         piece.setAttributeNS(null, "id", "piece_" + pieceCounter);
         pieceCounter++;
@@ -44,6 +42,8 @@ function createPiece(playerID) {
 
 }
 
+
+//creates opponent piece
 function createOpponentPiece(cx, cy, playerID) {
 
     var piece = document.createElementNS(svgns, "circle");
@@ -55,19 +55,14 @@ function createOpponentPiece(cx, cy, playerID) {
     }
 
     piece.setAttributeNS(null, "r", "26");
-    // piece.setAttributeNS(null, "id", "1");
     piece.setAttributeNS(null, "cx", cx);
     piece.setAttributeNS(null, "cy", cy);
-    // console.log("cx " + cx);
-    // console.log("cy " + cy);
     piece.setAttributeNS(null, "class", "playedPiece");
-    // piece.setAttributeNS(null, "id", "opponentPiece");
     document.getElementsByTagName('svg')[0].appendChild(piece);
 
 }
+//creates played piece
 function createPlayedPiece(cx, cy, playerID) {
-
-
     var piece = document.createElementNS(svgns, "circle");
     piece.setAttributeNS(null, "r", "26");
     if (playerID == 1) {
@@ -76,33 +71,16 @@ function createPlayedPiece(cx, cy, playerID) {
     else {
         piece.setAttributeNS(null, "fill", "black");
     }
-    piece.setAttributeNS(null, "r", "26");
     piece.setAttributeNS(null, "cx", cx);
     piece.setAttributeNS(null, "cy", cy);
     piece.setAttributeNS(null, "class", "playedPiece");
-    // piece.setAttributeNS(null, "id", "myPiece");
     document.getElementsByTagName('svg')[0].appendChild(piece);
-
 }
+//iterates through board array and makes updates on page
 function updateBoard(boardArr) {
     [].forEach.call(document.querySelectorAll('.playedPiece'), function (e) {
         e.parentNode.removeChild(e);
     });
-    // boardArr = new Array();
-    // for (var i = 0; i < 6; i++) {
-    //     subArray = new Array();
-    //     for (var j = 0; j < 7; j++) {
-    //         var random = Math.random();
-    //         if (random < .5) {
-    //             random = 1;
-    //         }
-    //         else {
-    //             random = 2;
-    //         }
-    //         subArray[j] = random;
-    //     }
-    //     boardArr[i] = subArray;
-    // }
     if (typeof boardArr != 'undefined') {
         //console.log(JSON.parse(boardArr));
         var parseBoard = JSON.parse(boardArr);
@@ -112,11 +90,9 @@ function updateBoard(boardArr) {
                 var cy = (i * 80) + 120;
                 if (parseInt(parseBoard[i][j]) == 1) {
                     createPlayedPiece(cx, cy, 1);
-                    //  console.log("createPlayedPiece(cx, cy);");
                 }
                 else if (parseInt(parseBoard[i][j]) == 2) {
                     createOpponentPiece(cx, cy, 2);
-                    //  console.log("createOpponentPiece(cx, cy);");
                 }
 
             }
@@ -130,35 +106,31 @@ document.getElementsByTagName('svg')[0].addEventListener('mousemove', drag, fals
 document.getElementsByTagName('svg')[0].addEventListener('mouseup', releaseDrag, false);
 var mover = '';
 var myX, myY;
+//sets variables for cx and cy for piece
 function setDrag(id) {
     mover = id;
-    // console.log(mover);
+
     myX = document.getElementById(mover).getAttributeNS(null, 'cx');
     myY = document.getElementById(mover).getAttributeNS(null, 'cy');
-    // console.log(myX);
-    // console.log(myY);
 }
-function move(evt) {
-    //console.log(evt);
-    if (mover != '') {
-        //I should be dragging something! (id)
-        var me = document.getElementById(mover);
-        //evt.clientX and Y are NOT what we want - they are from the top left of the page (not container)
-        if (document.all) { //offsetX and Y FAIL in FireFox
-            me.setAttributeNS(null, 'cx', evt.offsetX);
-            me.setAttributeNS(null, 'cy', evt.offsetY);
-        } else {	//layerX and layerY FAIL in IE
-            me.setAttributeNS(null, 'cx', evt.layerX);
-            me.setAttributeNS(null, 'cy', evt.layerY);
-        }
 
+//releases piece and snaps to a legal space
+function releaseDrag(evt) {
+    if (mover != '') {
+
+        var curX = evt.target.getAttribute('cx');
+        document.getElementById(mover).setAttributeNS(null, 'cy', '40');
+        var currentX = (parseInt(curX / 80) * 80) + 40;
+        document.getElementById(mover).setAttributeNS(null, 'cx', currentX);
+        mover = '';			
     }
+
 }
+//function that is called on mouse down and updates the piece in relationship to the mouse
 function drag(evt) {
     if (mover != '') {
         var me = document.getElementById(mover);
         var board = $('.boardContainer svg').position();
-        // console.log(evt.clientX - board.left);
         me.setAttribute('cx', (evt.clientX - board.left));
         me.setAttribute('cy', (evt.clientY - board.top + $(window).scrollTop()));
     }
@@ -166,6 +138,7 @@ function drag(evt) {
 
     }
 }
+//attempts to make a play by sending move to server
 function playPiece(ele) {
     var pieceData = {
         game_id: gameid,
@@ -189,41 +162,11 @@ function playPiece(ele) {
         },
         failure: function (err) {
             console.log(err);
-
-
         },
-
     });
 }
-function releaseDrag(evt) {
-    if (mover != '') {
-        //when i fire am i on a good space? (a cell)
 
-        var curX = evt.target.getAttribute('cx');
-        document.getElementById(mover).setAttributeNS(null, 'cy', '40');
-
-        var currentX = (parseInt(curX / 80) * 80) + 40;
-        document.getElementById(mover).setAttributeNS(null, 'cx', currentX);
-
-        mover = '';
-        //   document.getElementsByClassName('unplayedPiece')[0].remove();
-        //check to see if this point is insde of a cell
-        // var hit = checkHit(curX,curY);
-        // if(hit) {
-        // //im on a square
-        // mover = '';
-        // }
-        // else {
-        //     //i am not bounce back
-        //     document.getElementById(mover).setAttribute(null,'cx',cX);
-        //     document.getElementById(mover).setAttribute(null,'cy',cY);
-        //     mover = '';
-        // }
-        //get my original coords				
-    }
-
-}
-
+//gets all info for current game being played
 function getGameState() {
     $.ajax({
         type: "POST",
@@ -236,17 +179,11 @@ function getGameState() {
             console.log(data);
             if (data.data[0].gameState == "forfeit") {
                 checkForfeit();
-
-
-                //call check forfeit 
-
-
             }
             else if (data.data[0].gameState == "ended") {
                 checkWinner();
             }
             updateBoard(data.data[0].boardArray);
-
         },
         failure: function (err) {
             console.log(err);
@@ -255,7 +192,7 @@ function getGameState() {
 
     });
 }
-
+//checks whether the game has a winner set
 function checkWinner() {
     $.ajax({
         type: "POST",
@@ -288,22 +225,17 @@ function checkWinner() {
                     });
                     setTimeout(function () { window.location = "/laravelProject/public/home"; }, 10000);
                 }
-                
-
             }
-
-            // updateBoard(data.data[0].boardArray);
 
         },
         failure: function (err) {
             console.log(err);
-
         },
-
     });
 }
 
-function checkForfeit(){
+//checks whether a player has forfeited
+function checkForfeit() {
     $.ajax({
         type: "POST",
         async: true,
@@ -327,11 +259,7 @@ function checkForfeit(){
                     Swal.fire("You have forfeited the game");
                     setTimeout(function () { window.location = "/laravelProject/public/home"; }, 10000);
                 }
-                // window.location = "/laravelProject/public/home";
             }
-
-            // updateBoard(data.data[0].boardArray);
-
         },
         failure: function (err) {
             console.log(err);
@@ -339,9 +267,10 @@ function checkForfeit(){
         },
 
     });
-    
+
 }
 
+//checks the game to see whos turn it is and updates on screen
 function checkTurn() {
     $.ajax({
         type: "POST",
@@ -351,20 +280,15 @@ function checkTurn() {
         dataType: "json",
         data: game,
         success: function (data) {
-            // console.log("checkTurn");
-            // console.log(data);
             if (data.success == false) {
                 [].forEach.call(document.querySelectorAll('.unplayedPiece'), function (e) {
                     e.parentNode.removeChild(e);
                 });
                 $('#whosTurn').text('opponents turn');
-
-
             }
             else {
                 $('#whosTurn').text('your turn');
                 if (document.getElementById("piece_0") == null) {
-                    // console.log("append piece here");
                     if (data.data.playerTurn == data.data.player1ID) {
                         createPiece(1);
                     }
@@ -409,23 +333,16 @@ function forfeit() {
 
 }
 $(window).on('beforeunload', function (evt) {
-
-    // var r = confirm("Are you sure you want to quit?");
-    // if (r == true) {
     forfeit();
-    // }
 
 });
 $(window).on('unload', function (evt) {
     forfeit();
-
 });
 $(document).on("dblclick", ".unplayedPiece", function (e) {
 
     var dialog = confirm("are you sure you want to move here?");
     if (dialog) {
-        // var square = parseInt(document.getElementById(mover).getAttribute('cx') / 80);
-        // playPiece(square);
         var square = parseInt(document.getElementsByClassName('unplayedPiece')[0].getAttribute('cx') / 80);
         playPiece(square);
         $('.unplayedPiece').remove();
@@ -458,14 +375,8 @@ $(document).ready(function () {
         });
         return false;
     });
-
-
-
-
 });
 function checkGameChat() {
-    //   if(typeof game != 'undefined'){
-
     $.ajax({
         type: "POST",
         async: true,
@@ -494,10 +405,4 @@ function checkGameChat() {
         },
 
     });
-    //   }
-
 }
-
-
-
-//gamePoller = setInterval(checkGame, 1000);

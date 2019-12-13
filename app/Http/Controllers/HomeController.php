@@ -30,6 +30,8 @@ class HomeController extends Controller
     {
         
         $user = Auth::user();
+        \DB::table('games')->where('gameState', '=', 'challenge')->where('player1ID','=',$user->id)->delete();
+        \DB::table('games')->where('gameState', '=', 'forfeit')->where('player1ID','=',$user->id)->delete();
         //\DB::table('games')->where('gameState', '=', 'challenge')->where('player1ID','=',$user->id)->orWhere('player2ID','=',$user->id)->delete();
         $user->playerStatus = "waiting";
         $user->touch();
@@ -43,6 +45,13 @@ class HomeController extends Controller
         $user = Auth::user();
         $games = \DB::table('games')->where('player1ID','=',$user->id)->orWhere('player2ID','=',$user->id)->get();
         return view('profile',['user'=>$user,'games' =>$games]);
+    }
+
+    public function userInactive(Request $request){
+        $user = Auth::user();
+        $user->playerStatus = "inactive";
+        $user->save();
+
     }
 
         /**
@@ -101,7 +110,7 @@ class HomeController extends Controller
     public function getLobbyUsers(Request $request){
 
         $user = Auth::user();  
-        $waitingUsers = User::where('id',"!=",$user->id)->where("playerStatus","=","waiting")->whereBetween('updated_at', [now()->subMinutes(30), now()])->get();
+        $waitingUsers = User::where('id',"!=",$user->id)->where("playerStatus","=","waiting")->where("playerStatus","!=","inactive")->whereBetween('updated_at', [now()->subMinutes(30), now()])->get();
 
         if($waitingUsers == null || $waitingUsers->count() < 1){
             return response()->json([
@@ -153,7 +162,7 @@ class HomeController extends Controller
         'challenge' => 'required',
     ]);
     $user = Auth::user();  
-    \DB::table('games')->where('gameState', '=', 'challenge')->orWhere('player1ID','=',$user->id)->delete();
+    \DB::table('games')->where('gameState', '=', 'challenge')->where('player1ID','=',$user->id)->delete();
     $game = new Game();
     $game->player1ID = $user->id;
     $game->player2ID = (int) $request->challenge;
@@ -177,7 +186,7 @@ public function joinGame(Request $request){
     $user = Auth::user();  
     $game= Game::where("id","=",$request->gameid)->where("gameState","=","challenge")->first();
    
-    if($game == null || $game->count() != 1){
+    if($game == null){
         return response()->json([
             'success'  => false
             ]);
@@ -192,6 +201,20 @@ public function joinGame(Request $request){
 
 }
 
+public function denyGame(Request $request){
+    $this->validate( $request,[
+        'gameid' => 'required',
+    ]); 
+    $game= Game::where("id","=",$request->gameid)->delete();
+   
+
+   return response()->json([
+    'success'  => true
+
+    ]);
+
+}
+
     /**
      * user is waiting for response from other user if they want to join game
      *@param request object
@@ -201,17 +224,18 @@ public function joinGame(Request $request){
 public function getChallenges(Request $request){
 
     $user = Auth::user();  
-    $game= Game::where("player2ID","=",$user->id)->where("gameState","=","challenge")->first();
+    $game= Game::where("player2ID","=",$user->id)->where("gameState","=","challenge")->latest("created_at")->first();
+
     if($game != null){
         $challenger = User::where('id','=',$game->player1ID)->first();
         $game->challenger = $challenger->name;
     }
 
-
    
-    if($game == null || $game->count() != 1){
+    if($game == null){
         return response()->json([
-            'success'  => false
+            'success'  => false,
+            'data' => $game
             ]);
     }
    return response()->json([

@@ -9,11 +9,19 @@ var baseurl = "/laravelProject/public/";
 checkChat();
 checkLobbyUsers();
 chatPoller = setInterval(checkChat, 1000);
-userPoller = setInterval(checkLobbyUsers, 500);
+userPoller = setInterval(checkLobbyUsers, 5000);
 challengeAcceptedPoller = setInterval(checkChallengeAccept, 5000);
 var challengePoller = setInterval(checkChallenge, 5000);
 
 $(document).ready(function () {
+    $(window).on('beforeunload', function (evt) {
+        userInactive();
+
+    });
+    $(window).on('unload', function (evt) {
+        userInactive();
+
+    });
     //ajax call on form to prevent it from submitting and sending chat messages to database
     $(".chatSend").on("submit", function (e) {
         e.preventDefault();
@@ -68,8 +76,32 @@ $(document).ready(function () {
     });
 
 
-    
+
 });
+
+function userInactive() {
+    console.log("userInactive");
+
+
+    $.ajax({
+        type: "POST",
+        async: true,
+        cache: false,
+        url: baseurl + "userInactive",
+        dataType: "json",
+        data: csrf,
+        success: function (data) {
+            console.log("userInactive");
+            console.log(data);
+        },
+        failure: function (err) {
+            console.log(err);
+
+        },
+
+    });
+
+}
 
 //polls database to see if there are new chat messages
 function checkChat() {
@@ -114,7 +146,11 @@ function checkLobbyUsers() {
                         userName += "<div class='availableUsers' data-user='" + data.data[i].id + "'>" + data.data[i].name + "</div>";
                     }
                 }
+
                 $('#waiting-users').html(userName);
+            }
+            else {
+                $('#waiting-users').html("");
             }
         },
         failure: function (err) {
@@ -161,13 +197,15 @@ function checkChallenge() {
         dataType: "json",
         data: csrf,
         success: function (data) {
-
+            console.log(data);
             if (data.success) {
                 clearInterval(challengePoller);
                 var r = confirm("Do you want to play " + data.data.challenger + "?");
                 if (r == true) {
                     joinGame(data.data.id);
                 } else {
+                    denyGame(data.data.id);
+
                     challengePoller = setInterval(checkChallenge, 5000);
 
                 }
@@ -200,6 +238,32 @@ function joinGame(id) {
             if (data.success) {
                 window.location.href = "playgame/" + id;
             }
+        },
+        failure: function (err) {
+            console.log(err);
+        },
+
+    });
+    //   }
+
+}
+
+function denyGame(id) {
+    var game = {
+        gameid: id,
+        _token: $('meta[name="csrf-token"]').attr('content')
+    };
+
+    console.log('joinGame');
+    $.ajax({
+        type: "POST",
+        async: true,
+        cache: false,
+        url: baseurl + "denyGame",
+        dataType: "json",
+        data: game,
+        success: function (data) {
+            console.log(data);
         },
         failure: function (err) {
             console.log(err);
