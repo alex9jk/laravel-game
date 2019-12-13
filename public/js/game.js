@@ -8,7 +8,7 @@ var game = {
     id: gameid,
     _token: $('meta[name="csrf-token"]').attr('content')
 };
-var baseurl = "/laravelProject/public/";
+var baseurl = "/public/";
 var svgns = "http://www.w3.org/2000/svg";
 
 var pieceCounter = 0;
@@ -193,7 +193,7 @@ function checkWinner() {
                         title: 'Connect Four!',
                         text: 'You Won!'
                     });
-                    setTimeout(function () { window.location = "/laravelProject/public/home"; }, 10000);
+                    setTimeout(function () { window.location = "/public/home"; }, 10000);
                 }
                 else if (data.winner == false) {
                     Swal.fire({
@@ -201,7 +201,7 @@ function checkWinner() {
                         title: 'Oh no!',
                         text: 'You Lost!'
                     });
-                    setTimeout(function () { window.location = "/laravelProject/public/home"; }, 10000);
+                    setTimeout(function () { window.location = "/public/home"; }, 10000);
                 }
             }
         },
@@ -227,11 +227,11 @@ function checkForfeit() {
                 clearInterval(checkTurnPoller);
                 if (data.winner == true) {
                     Swal.fire("Opponent has forfeited");
-                    setTimeout(function () { window.location = "/laravelProject/public/home"; }, 10000);
+                    setTimeout(function () { window.location = "/public/home"; }, 10000);
                 }
                 else if (data.winner == false) {
                     Swal.fire("You have forfeited the game");
-                    setTimeout(function () { window.location = "/laravelProject/public/home"; }, 10000);
+                    setTimeout(function () { window.location = "/public/home"; }, 10000);
                 }
             }
         },

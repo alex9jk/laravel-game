@@ -3,7 +3,7 @@
 var csrf = {
     _token: $('meta[name="csrf-token"]').attr('content')
 };
-var baseurl = "/laravelProject/public/";
+var baseurl = "/public/";
 
 //init functions and polling functions
 checkChat();
