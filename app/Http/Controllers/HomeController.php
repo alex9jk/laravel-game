@@ -32,7 +32,7 @@ class HomeController extends Controller
         $user = Auth::user();
         \DB::table('games')->where('gameState', '=', 'challenge')->where('player1ID','=',$user->id)->delete();
         \DB::table('games')->where('gameState', '=', 'forfeit')->where('player1ID','=',$user->id)->delete();
-        //\DB::table('games')->where('gameState', '=', 'challenge')->where('player1ID','=',$user->id)->orWhere('player2ID','=',$user->id)->delete();
+    
         $user->playerStatus = "waiting";
         $user->touch();
         $user->save();
@@ -41,17 +41,26 @@ class HomeController extends Controller
         return view('home',['user'=>$user,'messages'=>$messages,'games' =>$games]);
     }
 
+        /**
+     * 
+     *Sets up profile page with games table
+     * @return view for profile page along game stats to populate table
+     */
     public function profile(){
         $user = Auth::user();
         $games = \DB::table('games')->where('player1ID','=',$user->id)->orWhere('player2ID','=',$user->id)->get();
         return view('profile',['user'=>$user,'games' =>$games]);
     }
 
+        /**
+     * 
+     *Sets current user's status to inactive if they log out
+     * @param Request object
+     */
     public function userInactive(Request $request){
         $user = Auth::user();
         $user->playerStatus = "inactive";
         $user->save();
-
     }
 
         /**
@@ -63,8 +72,7 @@ class HomeController extends Controller
     public function chat(Request $request){
 
         $this->validate( $request,[
-            'message' => 'required',
-            
+            'message' => 'required',          
         ]);
         $user = Auth::user();
         
@@ -120,9 +128,7 @@ class HomeController extends Controller
        return response()->json([
         'success'  => true,
         'data' => $waitingUsers
-    
         ]);
-
     }
     /**
      * 
@@ -131,24 +137,18 @@ class HomeController extends Controller
      * @return all associated game info
      */
     public function getChallengeAccepted(Request $request){
-
-        // $this->validate( $request,[
-        //     'gameid' => 'required',
-        // ]);
-         $user = Auth::user();  
+        $user = Auth::user();  
         $game= Game::where("player1ID","=",$user->id)->where("gameState","=","playing")->get();
         if($game == null || $game->count() != 1){
             return response()->json([
-                'success'  => false
-                
+                'success'  => false        
                 ]);
         }
        return response()->json([
         'success'  => true,
         'data' => $game
     
-        ]);
-    
+        ]);  
  }
      /**
      * creates a new game and sets the challenger and person being challenged
@@ -171,7 +171,6 @@ class HomeController extends Controller
    return response()->json([
     'success'  => true,
     'data' => $game
-
     ]);
 }
     /**
@@ -196,23 +195,23 @@ public function joinGame(Request $request){
    return response()->json([
     'success'  => true,
     'data' => $game
-
     ]);
-
 }
 
+    /**
+     * 
+     *If a player denies a challenge to a game, remove the game from the database
+     * @return json obj
+     */
 public function denyGame(Request $request){
     $this->validate( $request,[
         'gameid' => 'required',
     ]); 
     $game= Game::where("id","=",$request->gameid)->delete();
-   
 
    return response()->json([
     'success'  => true
-
     ]);
-
 }
 
     /**
@@ -229,9 +228,7 @@ public function getChallenges(Request $request){
     if($game != null){
         $challenger = User::where('id','=',$game->player1ID)->first();
         $game->challenger = $challenger->name;
-    }
-
-   
+    } 
     if($game == null){
         return response()->json([
             'success'  => false,

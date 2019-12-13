@@ -14,13 +14,12 @@ challengeAcceptedPoller = setInterval(checkChallengeAccept, 5000);
 var challengePoller = setInterval(checkChallenge, 5000);
 
 $(document).ready(function () {
+    //when user logs out removes from available users to play
     $(window).on('beforeunload', function (evt) {
         userInactive();
-
     });
     $(window).on('unload', function (evt) {
         userInactive();
-
     });
     //ajax call on form to prevent it from submitting and sending chat messages to database
     $(".chatSend").on("submit", function (e) {
@@ -38,9 +37,7 @@ $(document).ready(function () {
             },
             failure: function (err) {
                 console.log(err);
-
             },
-
         });
         return false;
     });
@@ -61,14 +58,10 @@ $(document).ready(function () {
                 dataType: "json",
                 data: challengeUser,
                 success: function (data) {
-                    //  console.log(data);
-
                 },
                 failure: function (err) {
                     console.log(err);
-
                 },
-
             });
         } else {
             return false;
@@ -79,10 +72,8 @@ $(document).ready(function () {
 
 });
 
+//ajax call to check to see if user is inactive -logged out or changed urls
 function userInactive() {
-    console.log("userInactive");
-
-
     $.ajax({
         type: "POST",
         async: true,
@@ -91,8 +82,6 @@ function userInactive() {
         dataType: "json",
         data: csrf,
         success: function (data) {
-            console.log("userInactive");
-            console.log(data);
         },
         failure: function (err) {
             console.log(err);
@@ -138,7 +127,6 @@ function checkLobbyUsers() {
         dataType: "json",
         data: csrf,
         success: function (data) {
-            // console.log(data);
             if (data.success) {
                 var userName = "";
                 if (data.data.length > 0) {
@@ -146,7 +134,6 @@ function checkLobbyUsers() {
                         userName += "<div class='availableUsers' data-user='" + data.data[i].id + "'>" + data.data[i].name + "</div>";
                     }
                 }
-
                 $('#waiting-users').html(userName);
             }
             else {
@@ -171,8 +158,6 @@ function checkChallengeAccept() {
         dataType: "json",
         data: csrf,
         success: function (data) {
-            console.log("checkChallengeAccepted");
-            console.log(data);
             if (data.success) {
                 window.location.href = "playgame/" + data.data[0].id;
             }
@@ -187,8 +172,6 @@ function checkChallengeAccept() {
 }
 //polls database to let a user know if they have been challenged by other user
 function checkChallenge() {
-
-    console.log('checkChallenge');
     $.ajax({
         type: "POST",
         async: true,
@@ -197,7 +180,6 @@ function checkChallenge() {
         dataType: "json",
         data: csrf,
         success: function (data) {
-            console.log(data);
             if (data.success) {
                 clearInterval(challengePoller);
                 var r = confirm("Do you want to play " + data.data.challenger + "?");
@@ -225,7 +207,6 @@ function joinGame(id) {
         _token: $('meta[name="csrf-token"]').attr('content')
     };
 
-    console.log('joinGame');
     $.ajax({
         type: "POST",
         async: true,
@@ -234,7 +215,6 @@ function joinGame(id) {
         dataType: "json",
         data: game,
         success: function (data) {
-            console.log(data);
             if (data.success) {
                 window.location.href = "playgame/" + id;
             }
@@ -244,17 +224,15 @@ function joinGame(id) {
         },
 
     });
-    //   }
 
 }
 
+//ajax call if player declines the challenge to game
 function denyGame(id) {
     var game = {
         gameid: id,
         _token: $('meta[name="csrf-token"]').attr('content')
     };
-
-    console.log('joinGame');
     $.ajax({
         type: "POST",
         async: true,
@@ -268,8 +246,5 @@ function denyGame(id) {
         failure: function (err) {
             console.log(err);
         },
-
     });
-    //   }
-
 }

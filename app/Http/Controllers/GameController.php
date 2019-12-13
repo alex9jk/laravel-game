@@ -29,7 +29,6 @@ class GameController extends Controller
         //set up array of arrays for board 
         //array with 6 arrays in it with 7 0s
         //set values in array to 0
-        //JSON.stringify()
         $boardArray = array();
         for($i=0;$i<6;$i++){
             $subArray = array();
@@ -43,11 +42,16 @@ class GameController extends Controller
         $game->save();
         if($game == null){
             return redirect('/home');
-        }
-        
+        }        
         return view('game.playgame',['user'=>$user,'game'=>$game]);
       //  return view('game.playgame');
     }
+                /**
+     * 
+     *Checks the status of the game
+     *@param request object
+     * @return json with game data
+     */
     public function checkStatus(Request $request){
 
         $this->validate( $request,[
@@ -61,7 +65,6 @@ class GameController extends Controller
             'data' => $game
         ]);
     }
-
             /**
      * 
      *Posts message to game chat from form
@@ -86,7 +89,6 @@ class GameController extends Controller
             'success'  => true
         ]);
     }
-
             /**
      * 
      *Gets messages from database for the game chat --gets all messages with current gameid
@@ -115,7 +117,12 @@ class GameController extends Controller
         ]);
      }   
     }
-
+            /**
+     * 
+     *Once a player has forfeited update the database to reflect the gamestate and the winner of the game
+     *@param request object
+     * @return if the game is over return true with game data if not return false
+     */
     public function quitGame(Request $request){
         $this->validate( $request,[
             'id' => 'required'
@@ -144,7 +151,12 @@ class GameController extends Controller
     
         ]);
     }
-
+            /**
+     * 
+     *Gets the state of the game
+     *@param request object
+     * @return if there is a game return true with game data if not return false
+     */
     public function gameState(Request $request){
         $this->validate( $request,[
             'id' => 'required'
@@ -154,17 +166,14 @@ class GameController extends Controller
 
         if($game == null || $game->count() != 1){
             return response()->json([
-                'success'  => false
-                
+                'success'  => false               
                 ]);
         }
        return response()->json([
         'success'  => true,
         'data' => $game
-    
         ]);
     }
-
                     /**
      * 
      *checks the winner of the game by calling all connect 4 checks
@@ -186,8 +195,6 @@ class GameController extends Controller
             $win =  $this->checkVertical($board);
         }
         return $win;
-
-
     }
 
                 /**
@@ -207,10 +214,8 @@ class GameController extends Controller
               }
           }
         }
-        return false;
-    
+        return false;   
       }
-
                       /**
      * 
      *checks whether there is connect 4 match diagnolly from top right to bottom left
@@ -228,8 +233,7 @@ class GameController extends Controller
               }
           }
         }
-        return false;
-    
+        return false; 
       }
                       /**
      * 
@@ -238,7 +242,6 @@ class GameController extends Controller
      * @return 1 for player 1 connect 4 and 2 for player 2  connect 4
      */
     public function checkHorizontal($board) {
-
         for($x =sizeof($board[0])-1; $x>=0;$x--){
             for($y = sizeof($board) -1; $y>=0; $y--){
               if(isset($board[$y][$x]) && $board[$y][$x] == "1" && isset($board[$y][$x-1]) && $board[$y][$x-1] == "1" && isset($board[$y][$x-2]) && $board[$y][$x-2] == "1" && isset($board[$y][$x-3]) && $board[$y][$x-3] == "1" ){
@@ -249,12 +252,9 @@ class GameController extends Controller
                 }
             }
           }
-          return false;
-      
-    
+          return false;   
       }
-
-                      /**
+                  /**
      * 
      *checks whether there is connect 4 match vertically
      * @param board array
@@ -272,11 +272,13 @@ class GameController extends Controller
             }
           }
           return false;
-      
-    
       }
-
-
+                      /**
+     * 
+     *All operations involved in playing a piece -updating whos turn it is, checking if legal move
+     * @param request object
+     * @return game data
+     */
     public function playPiece(Request $request){
         $this->validate( $request,[
             'xcoord' => 'required',
@@ -285,6 +287,7 @@ class GameController extends Controller
         $game = Game::where('id',"=",$request->game_id)->first();
         $board = json_decode($game->boardArray);
         $user = Auth::user(); 
+        //sets whos turn it is and updates in db
         if($user->id == $game->playerTurn){
             if($game->player1ID == $user->id){
                 $playerNum = 1;
@@ -293,13 +296,14 @@ class GameController extends Controller
             else if($game->player2ID == $user->id){
                 $playerNum = 2;
                 $game->playerTurn = $game->player1ID;
-    
             }
+            //checks to see if legal move
             if($board[0][$request->xcoord] == 0 && $playerNum != null){
                 for($i=sizeof($board) -1; $i>-1; $i--){
                     if($board[$i][$request->xcoord] == 0){
                         $board[$i][$request->xcoord] =$playerNum;
                         $game->boardArray = json_encode($board);
+                        //checks to see if a player has won
                         $checkWin = $this->checkWinner($board);
                         if($checkWin != false){
                             if($checkWin == 1){
@@ -319,9 +323,7 @@ class GameController extends Controller
                             ]);
                     }
                 }
-
             }
-
         }
         return response()->json([
             'success'  => false,
@@ -330,7 +332,12 @@ class GameController extends Controller
         
 
     }
-
+                      /**
+     * 
+     *updates board
+     * @param request object
+     * 
+     */
     public function updateBoard(Request $request){
         $this->validate( $request,[
             'board' => 'required',
@@ -338,7 +345,12 @@ class GameController extends Controller
         ]);
         $game = Game::where('id',"=",$request->game_id)->first();
     }
-
+                      /**
+     * 
+     *Checks player turn
+     * @param request object
+     * @return game data true if its the current users turn else false
+     */
     public function checkTurn(Request $request){
         $this->validate( $request,[
             'id' => 'required'
@@ -357,8 +369,13 @@ class GameController extends Controller
                 'success'  => false             
                 ]);
         }
-
     }
+                          /**
+     * 
+     *Checks the winner of the game -if there is a winner and the gamestate is either ended or forfeit
+     * @param request object
+     * @return game data
+     */
     public function checkWinnerGame(Request $request) {
         $this->validate( $request,[
             'id' => 'required'

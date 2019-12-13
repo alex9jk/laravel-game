@@ -1,5 +1,5 @@
 
-
+//polling functions and game data
 var messages = {
     gameid: gameid,
     _token: $('meta[name="csrf-token"]').attr('content')
@@ -10,7 +10,7 @@ var game = {
 };
 var baseurl = "/laravelProject/public/";
 var svgns = "http://www.w3.org/2000/svg";
-//console.log(message);
+
 var pieceCounter = 0;
 checkGameChat();
 chatGamePoller = setInterval(checkGameChat, 1000);
@@ -31,15 +31,12 @@ function createPiece(playerID) {
         else {
             piece.setAttributeNS(null, "fill", "black");
         }
-
         piece.setAttributeNS(null, "class", "unplayedPiece");
         piece.setAttributeNS(null, "id", "piece_" + pieceCounter);
         pieceCounter++;
         piece.setAttributeNS(null, "onmousedown", "setDrag(this.id)");
         document.getElementsByTagName('svg')[0].appendChild(piece);
-
     }
-
 }
 
 
@@ -53,13 +50,11 @@ function createOpponentPiece(cx, cy, playerID) {
     else {
         piece.setAttributeNS(null, "fill", "black");
     }
-
     piece.setAttributeNS(null, "r", "26");
     piece.setAttributeNS(null, "cx", cx);
     piece.setAttributeNS(null, "cy", cy);
     piece.setAttributeNS(null, "class", "playedPiece");
     document.getElementsByTagName('svg')[0].appendChild(piece);
-
 }
 //creates played piece
 function createPlayedPiece(cx, cy, playerID) {
@@ -82,7 +77,6 @@ function updateBoard(boardArr) {
         e.parentNode.removeChild(e);
     });
     if (typeof boardArr != 'undefined') {
-        //console.log(JSON.parse(boardArr));
         var parseBoard = JSON.parse(boardArr);
         for (var i = 0; i < parseBoard.length; i++) {
             for (var j = 0; j < parseBoard[i].length; j++) {
@@ -94,13 +88,9 @@ function updateBoard(boardArr) {
                 else if (parseInt(parseBoard[i][j]) == 2) {
                     createOpponentPiece(cx, cy, 2);
                 }
-
             }
         }
     }
-
-
-
 }
 document.getElementsByTagName('svg')[0].addEventListener('mousemove', drag, false);
 document.getElementsByTagName('svg')[0].addEventListener('mouseup', releaseDrag, false);
@@ -109,7 +99,6 @@ var myX, myY;
 //sets variables for cx and cy for piece
 function setDrag(id) {
     mover = id;
-
     myX = document.getElementById(mover).getAttributeNS(null, 'cx');
     myY = document.getElementById(mover).getAttributeNS(null, 'cy');
 }
@@ -117,14 +106,12 @@ function setDrag(id) {
 //releases piece and snaps to a legal space
 function releaseDrag(evt) {
     if (mover != '') {
-
         var curX = evt.target.getAttribute('cx');
         document.getElementById(mover).setAttributeNS(null, 'cy', '40');
         var currentX = (parseInt(curX / 80) * 80) + 40;
         document.getElementById(mover).setAttributeNS(null, 'cx', currentX);
-        mover = '';			
+        mover = '';
     }
-
 }
 //function that is called on mouse down and updates the piece in relationship to the mouse
 function drag(evt) {
@@ -153,12 +140,9 @@ function playPiece(ele) {
         dataType: "json",
         data: pieceData,
         success: function (data) {
-            console.log("playPiece");
-            console.log(data);
             [].forEach.call(document.querySelectorAll('.unplayedPiece'), function (e) {
                 e.parentNode.removeChild(e);
             });
-
         },
         failure: function (err) {
             console.log(err);
@@ -176,7 +160,6 @@ function getGameState() {
         dataType: "json",
         data: game,
         success: function (data) {
-            console.log(data);
             if (data.data[0].gameState == "forfeit") {
                 checkForfeit();
             }
@@ -187,9 +170,7 @@ function getGameState() {
         },
         failure: function (err) {
             console.log(err);
-
         },
-
     });
 }
 //checks whether the game has a winner set
@@ -202,9 +183,6 @@ function checkWinner() {
         dataType: "json",
         data: game,
         success: function (data) {
-            console.log("checkWinner");
-            console.log(data);
-
             if (data.success == true) {
                 clearInterval(chatGamePoller);
                 clearInterval(gameStatePoller);
@@ -226,7 +204,6 @@ function checkWinner() {
                     setTimeout(function () { window.location = "/laravelProject/public/home"; }, 10000);
                 }
             }
-
         },
         failure: function (err) {
             console.log(err);
@@ -244,9 +221,6 @@ function checkForfeit() {
         dataType: "json",
         data: game,
         success: function (data) {
-            console.log("check Forfeit");
-            console.log(data);
-
             if (data.success == false) {
                 clearInterval(chatGamePoller);
                 clearInterval(gameStatePoller);
@@ -263,11 +237,8 @@ function checkForfeit() {
         },
         failure: function (err) {
             console.log(err);
-
         },
-
     });
-
 }
 
 //checks the game to see whos turn it is and updates on screen
@@ -295,24 +266,17 @@ function checkTurn() {
                     else if (data.data.playerTurn == data.data.player2ID) {
                         createPiece(2);
                     }
-
                 }
             }
-
         },
         failure: function (err) {
             console.log(err);
-
-
         },
-
     });
 }
 
+//ajax call that checks if player has forfeited game
 function forfeit() {
-    console.log("forfeit");
-    console.log(game);
-
     $.ajax({
         type: "POST",
         async: true,
@@ -321,26 +285,21 @@ function forfeit() {
         dataType: "json",
         data: game,
         success: function (data) {
-            console.log("forfeit");
-            console.log(data);
         },
         failure: function (err) {
             console.log(err);
-
         },
-
     });
-
 }
+//calls forfeit function if player reloads page or goes to different url
 $(window).on('beforeunload', function (evt) {
     forfeit();
-
 });
 $(window).on('unload', function (evt) {
     forfeit();
 });
+//event listener for playing a piece
 $(document).on("dblclick", ".unplayedPiece", function (e) {
-
     var dialog = confirm("are you sure you want to move here?");
     if (dialog) {
         var square = parseInt(document.getElementsByClassName('unplayedPiece')[0].getAttribute('cx') / 80);
@@ -351,7 +310,7 @@ $(document).on("dblclick", ".unplayedPiece", function (e) {
         return false;
     }
 });
-
+//ajax call on form to prevent it from submitting and sending chat messages to database
 $(document).ready(function () {
     $(".chatSend").on("submit", function (e) {
         e.preventDefault();
@@ -363,19 +322,17 @@ $(document).ready(function () {
             dataType: "json",
             data: $(this).serialize(),
             success: function (data) {
-
                 $('#messageBox').val('');
                 checkGameChat();
             },
             failure: function (err) {
                 console.log(err);
-
             },
-
         });
         return false;
     });
 });
+//polls database to see if there are new chat messages
 function checkGameChat() {
     $.ajax({
         type: "POST",
@@ -393,16 +350,11 @@ function checkGameChat() {
                     }
                     $('.box').html(messageText);
                 }
-
             }
-
-
             document.querySelector(".box").scrollTo(0, document.querySelector(".box").scrollHeight);
         },
         failure: function (err) {
             console.log(err);
-
         },
-
     });
 }
