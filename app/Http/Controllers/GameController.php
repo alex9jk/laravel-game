@@ -22,7 +22,7 @@ class GameController extends Controller
         $user = Auth::user();
         $user->playerStatus = "playing";
         $user->save();
-        $game = Game::where('gameState', '=', 'playing')->where('player1ID','=',$user->id)->orWhere('player2ID','=',$user->id)->first();
+        $game = Game::where('id','=',$id)->first();
         $userArray = array($game->player1ID,$game->player2ID);
         $random = Arr::random($userArray);
         $game->playerTurn = $random;
@@ -42,7 +42,10 @@ class GameController extends Controller
         $game->save();
         if($game == null){
             return redirect('/home');
-        }        
+        }
+        if($game->player1ID != $user->id && $game->player2ID != $user->id){
+            return redirect('/home');
+        }           
         return view('game.playgame',['user'=>$user,'game'=>$game]);
       //  return view('game.playgame');
     }

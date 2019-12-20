@@ -48,6 +48,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('/joinGame', 'HomeController@joinGame');
     Route::post('/denyGame', 'HomeController@denyGame');
     Route::post('/userInactive', 'HomeController@userInactive');
+    Route::post('/userActive', 'HomeController@userActive');
     
     
     Route::post('/getGameChat', 'GameController@getLobbyMessages');

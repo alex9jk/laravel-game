@@ -3,7 +3,7 @@
 var csrf = {
     _token: $('meta[name="csrf-token"]').attr('content')
 };
-var baseurl = "/public/";
+var baseurl = "/laravelProject/public/";
 
 //init functions and polling functions
 checkChat();
@@ -14,6 +14,7 @@ challengeAcceptedPoller = setInterval(checkChallengeAccept, 5000);
 var challengePoller = setInterval(checkChallenge, 5000);
 
 $(document).ready(function () {
+    userActive();
     //when user logs out removes from available users to play
     $(window).on('beforeunload', function (evt) {
         userInactive();
@@ -79,6 +80,25 @@ function userInactive() {
         async: true,
         cache: false,
         url: baseurl + "userInactive",
+        dataType: "json",
+        data: csrf,
+        success: function (data) {
+        },
+        failure: function (err) {
+            console.log(err);
+
+        },
+
+    });
+
+}
+
+function userActive() {
+    $.ajax({
+        type: "POST",
+        async: true,
+        cache: false,
+        url: baseurl + "userActive",
         dataType: "json",
         data: csrf,
         success: function (data) {
@@ -159,7 +179,7 @@ function checkChallengeAccept() {
         data: csrf,
         success: function (data) {
             if (data.success) {
-                window.location.href = "playgame/" + data.data[0].id;
+                window.location.href = baseurl +"playgame/" + data.data[0].id;
             }
 
         },
@@ -216,7 +236,7 @@ function joinGame(id) {
         data: game,
         success: function (data) {
             if (data.success) {
-                window.location.href = "playgame/" + id;
+                window.location.href = baseurl +"playgame/" + id;
             }
         },
         failure: function (err) {

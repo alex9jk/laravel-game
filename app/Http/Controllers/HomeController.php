@@ -30,9 +30,19 @@ class HomeController extends Controller
     {
         
         $user = Auth::user();
-        \DB::table('games')->where('gameState', '=', 'challenge')->where('player1ID','=',$user->id)->delete();
-        \DB::table('games')->where('gameState', '=', 'forfeit')->where('player1ID','=',$user->id)->delete();
-    
+        $games = \DB::table('games')->where('gameState', '=', 'challenge')->where('player1ID','=',$user->id)->get();
+       // dd($games);
+        if($games && $games->count() > 0){
+            $games->each(function($item,$key){
+                // dd($item);
+                $game = Game::findOrFail($item->id);
+                $game->gameState ="inactive";
+                $game->save();
+
+            });
+
+      }
+
         $user->playerStatus = "waiting";
         $user->touch();
         $user->save();
@@ -60,6 +70,12 @@ class HomeController extends Controller
     public function userInactive(Request $request){
         $user = Auth::user();
         $user->playerStatus = "inactive";
+        $user->save();
+    }
+
+    public function userActive(Request $request){
+        $user = Auth::user();
+        $user->playerStatus = "waiting";
         $user->save();
     }
 
@@ -102,7 +118,7 @@ class HomeController extends Controller
                 ]);
         }
         foreach($messages as $message){
-            $message->name = User::where('id',"=",$user->id)->get();
+            $message->name = User::where('id',"=",$message->user_id)->get();
         }
         return response()->json([
             'success'  => true,
@@ -207,7 +223,9 @@ public function denyGame(Request $request){
     $this->validate( $request,[
         'gameid' => 'required',
     ]); 
-    $game= Game::where("id","=",$request->gameid)->delete();
+    $game= Game::where("id","=",$request->gameid)->first();
+    $game->gameState ="inactive";
+    $game->save();
 
    return response()->json([
     'success'  => true
